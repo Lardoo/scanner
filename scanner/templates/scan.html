@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan</title>
+</head>
+
+<body>
+    <h1>Scan Website for SQL Injection Vulnerabilities</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="target_url">Target URL:</label>
+        <input type="url" id="target_url" name="target_url" required><br><br>
+        <input type="checkbox" id="deep_scan" name="deep_scan">
+        <label for="deep_scan">Deep Scan (Crawl the website for all endpoints)</label><br><br>
+        <button type="submit">Scan</button>
+    </form>
+</body>
+
+</html>
