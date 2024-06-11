@@ -13,6 +13,29 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 
+from decouple import config
+
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'litwebtech.com' #
+EMAIL_PORT = 587  # Change to your SMTP port
+EMAIL_USE_TLS = True  # Change accordingly
+EMAIL_HOST_USER = 'autoreply@litwebtech.com'  # Your email
+EMAIL_HOST_PASSWORD = 'NqzmtmXX_PG%'  # Your email password
+
+
+
+PAYPAL_ID = config('PAYPAL_ID')
+PAYPAL_SECRET = config('PAYPAL_SECRET')
+PAYPAL_BASE_URL = config('PAYPAL_BASE_URL')
+
+
+CSRF_TRUSTED_ORIGINS = [
+      # Replace with your actual domain
+    'https://vulnerabilityscanner.serveo.net',  # Add this line
+]
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +49,7 @@ SECRET_KEY = "django-insecure-1qy7+m6iyr-1&)-=qh2*50ee+_*pea_tx*_%dq0d*2nobyj37k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*","https://d39b668f137ad1491b48a0e2adac4fc2.serveo.net","127.0.0.1"]
 
 
 # Application definition
@@ -38,7 +61,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "scanner"
+    "scanner",
+    "rest_framework"
 ]
 
 MIDDLEWARE = [
@@ -81,7 +105,9 @@ DATABASES = {
         'NAME': 'scannerdb',
         'USER': 'postgres',
         'PASSWORD': 'Anonymous',
-        'HOST': 'localhost'
+        'HOST': 'localhost',
+        'PORT': '5432'
+       
     }
 }
 

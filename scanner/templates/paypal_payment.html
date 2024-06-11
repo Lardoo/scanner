@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scan</title>
+    <title>Checkout with PayPal</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,36 +15,17 @@
             align-items: center;
             height: 100vh;
         }
-
-        form {
+        .container {
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 40px;
             text-align: center;
         }
-
         h1 {
             color: #333;
         }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        input[type="url"],
-        input[type="checkbox"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-
-        button[type="submit"] {
+        button {
             background-color: #007bff;
             color: #fff;
             border: none;
@@ -55,23 +35,29 @@
             font-size: 16px;
             transition: background-color 0.3s ease;
         }
-
-        button[type="submit"]:hover {
+        button:hover {
             background-color: #0056b3;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
-
 <body>
-    <form method="post">
-        {% csrf_token %}
-        <h1>Scan Website for SQL Injection Vulnerabilities</h1>
-        <label for="target_url">Target URL:</label>
-        <input type="url" id="target_url" name="target_url" required><br><br>
-        <input type="checkbox" id="deep_scan" name="deep_scan">
-        <label for="deep_scan">Deep Scan (Crawl the website for all endpoints)</label><br><br>
-        <button type="submit">Scan</button>
-    </form>
+    <div class="container">
+        <h1>Checkout with PayPal</h1>
+        <form action="{% url 'paypal_create' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Checkout with PayPal</button>
+        </form>
+    </div>
+    <a href="{% url 'index' %}" class="back-link">Back to Home</a>
 </body>
-
 </html>

@@ -8,7 +8,47 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 
-# Function to scan for SQL injection vulnerabilities
+#start of paypal imports
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import permissions
+from .utils import make_paypal_payment,verify_paypal_payment#, execute_paypal_payment
+from django.views import View
+from django.middleware.csrf import get_token
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import authenticate, login as auth_login ,  logout as auth_logout
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required 
+from django.core.mail import send_mail
+import random
+import string
+from .forms import RegistrationForm
+from django.utils.decorators import method_decorator
+from .models import Profile
+from .decorators import premium_required
+from django.utils.decorators import method_decorator
+
+
+
+
+def index(request):
+    return render(request,'index.html')
+
+
+
+
+
+
+@login_required
+def profile(request):
+    return render(request, 'profile.html', {'user': request.user})
+
+
+
+
+@login_required
+@premium_required
 def scan(request):
     if request.method == 'POST':
         target_url = request.POST.get('target_url')
@@ -27,17 +67,29 @@ def scan(request):
             vulnerabilities.extend(detect_sql_injection(endpoint))
         
         # Save scan results to the database
+        scan_results = []
         for vulnerability in vulnerabilities:
-            ScanResult.objects.create(
+            result = ScanResult.objects.create(
                 url=vulnerability['endpoint'],
                 vulnerability_type=vulnerability['type'],
                 details=vulnerability['details'],
                 mitigation=vulnerability['mitigation'],
-                payload=vulnerability.get('payload', None)  # Include payload if available
+                payload=vulnerability.get('payload', None),  # Include payload if available
+                user=request.user  # Assign the current user to the scan result
             )
+            scan_results.append(result)
 
-        return HttpResponse("Scan completed. Check scan results.")
+        return render(request, 'scan_results.html', {'scan_results': scan_results})
+    
     return render(request, 'scan.html')
+
+
+
+# Scan Results  View
+@login_required
+def scan_results(request):
+    return render(request, 'scan_results.html')
+
 
 
 # Function to detect SQL injection vulnerabilities
@@ -306,35 +358,184 @@ def crawl_website(url, visited=None):
     
     return endpoints
 
-#todo add 2FA multifactor authentication
-def user_login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('scan')
-        else:
-            messages.error(request, 'Invalid username or password.')
-    return render(request, 'login.html')
+# Function to generate OTP
+def generate_otp():
+    return str(random.randint(100000, 999999))
 
-def user_logout(request):
-    logout(request)
+# Function to send OTP via email
+def send_otp_email(email, otp):
+    subject = 'Login OTP'
+    message = f"Your OTP is: {otp}"
+    from_email = 'autoreply@litwebtech.com'  # Your email
+    recipient_list = [email]
+    send_mail(subject, message, from_email, recipient_list)
+
+
+
+# Registration View
+class RegisterView(View):
+    def get(self, request):
+        form = RegistrationForm()
+        return render(request, 'register.html', {'form': form})
+
+    def post(self, request):
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            Profile.objects.get_or_create(user=user) # Create Profile object with default premium_status=False
+            return redirect('login')
+        return render(request, 'register.html', {'form': form})
+
+# Login View with 2FA
+def login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                # Generate OTP and send via email
+                otp = generate_otp()
+                send_otp_email(user.email, otp)
+                # Store the OTP in the user's session for verification
+                request.session['otp'] = otp
+                request.session['user_id'] = user.id
+                return redirect('otp_verification')
+            else:
+                # Invalid credentials
+                return render(request, 'login.html', {'form': form, 'error': 'Invalid login credentials.'})
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
+
+
+# OTP Verification View
+def otp_verification(request):
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        if entered_otp:
+            stored_otp = request.session.get('otp')
+            user_id = request.session.get('user_id')
+            if entered_otp == stored_otp and user_id:
+                # Match the entered OTP with the stored OTP
+                user = User.objects.get(pk=user_id)
+                auth_login(request, user)
+                del request.session['otp']
+                del request.session['user_id']
+                return redirect('dashboard')
+            else:
+                error_message = 'Invalid OTP. Please try again.'
+                return render(request, 'otp_verification.html', {'error': error_message})
+    return render(request, 'otp_verification.html')
+
+
+# Dashboard View
+@login_required
+def dashboard(request):
+    return render(request, 'dashboard.html')
+
+# Logout View
+def logout(request):
+    auth_logout(request)
     return redirect('login')
 
-def register(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        email = request.POST['email']
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username is already taken.')
+
+
+
+@method_decorator(login_required, name='dispatch')
+class PaypalPaymentView(View):
+    def get(self, request, *args, **kwargs):
+        # Render a page with a checkout button
+        return render(request, 'paypal_payment.html')
+
+    def post(self, request, *args, **kwargs):
+        amount = 0.1  # Example amount
+        # Construct return and cancel URLs
+        return_url = request.build_absolute_uri('/paypal_execute/')
+        cancel_url = request.build_absolute_uri('/paypal_cancel/')
+        
+        status, payment_id, approval_url = make_paypal_payment(
+            amount=amount, 
+            currency="USD", 
+            return_url=return_url, 
+            cancel_url=cancel_url
+        )
+        
+        if status:
+            # Store payment ID in session for later verification
+            request.session['payment_id'] = payment_id
+            # Redirect the user to the PayPal approval URL
+            return redirect(approval_url)
         else:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            login(request, user)
-            return redirect('scan')
-    return render(request, 'register.html')
+            return render(request, 'payment_failed.html', {'message': f"Payment creation failed: {str(approval_url)}"})
+
+@login_required
+def paypal_execute(request):
+    payment_id = request.GET.get('paymentId')
+    payer_id = request.GET.get('PayerID')
+    
+    if payment_id and payer_id:
+        stored_payment_id = request.session.get('payment_id')
+        if stored_payment_id and payment_id == stored_payment_id:
+            if verify_paypal_payment(payment_id=payment_id, payer_id=payer_id):
+                # Update user's premium status
+                try:
+                    profile = request.user.profile
+                    profile.premium_status = True
+                    profile.save()
+                    del request.session['payment_id']
+                    return redirect('dashboard')
+                except Profile.DoesNotExist:
+                    return render(request, 'payment_failed.html', {'message': "User profile not found."})
+            else:
+                return render(request, 'payment_failed.html', {'message': "Payment verification failed."})
+    return render(request, 'payment_failed.html', {'message': "Payment ID or Payer ID missing."})
+
+@login_required
+def paypal_cancel(request):
+    return render(request, 'payment_failed.html', {'message': "Payment was cancelled."})
+
+
+@login_required
+def payment_success(request):
+    payment_id = request.GET.get('paymentId')
+    payer_id = request.GET.get('PayerID')
+
+    if payment_id and payer_id:
+        stored_payment_id = request.session.get('payment_id')
+        if stored_payment_id and payment_id == stored_payment_id:
+            if verify_paypal_payment(payment_id=payment_id, payer_id=payer_id):
+                profile, created = Profile.objects.get_or_create(user=request.user)
+                profile.premium_status = True
+                profile.save()
+                del request.session['payment_id']
+                return redirect('dashboard')
+            else:
+                return render(request, 'payment_failed.html', {'message': "Payment verification failed."})
+    return render(request, 'payment_failed.html', {'message': "Payment ID or Payer ID missing."})
+
+    
+
+class PaypalValidatePaymentView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        payment_id = request.data.get("payment_id")
+        payment_status = verify_paypal_payment(payment_id=payment_id)
+        if payment_status:
+            return Response({"success": True, "msg": "Payment approved"}, status=200)
+        else:
+            return Response({"success": False, "msg": "Payment failed or cancelled"}, status=200)
+
+
+
+
+# Payment Required View
+def payment_required_view(request):
+    return render(request, 'payment_required.html')
 
 
 
