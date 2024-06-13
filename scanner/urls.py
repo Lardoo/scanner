@@ -19,4 +19,5 @@ urlpatterns = [
     path('otp_verification/', views.otp_verification, name='otp_verification'),
     path('payment_required/', views.payment_required_view, name='payment_required'),
     path('scan_results/', views.scan_results, name='scan_results'),
+    path('download_scan_pdf/', views.download_scan_pdf, name='download_scan_pdf')
 ]

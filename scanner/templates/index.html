@@ -1,73 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+    <title>Home - Vulnerability Scanner</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
             margin: 0;
             padding: 0;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .navbar {
+            background-color: #007bff;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .navbar-nav .nav-link {
+            color: #fff;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #d1ecf1;
+        }
+
+        .jumbotron {
+            background: url('https://www.enterprisestorageforum.com/wp-content/uploads/2023/06/esf-vulnerability-scanning-and-management-696x453.png') no-repeat center center;
+            background-size: cover;
+            color: #fff;
+            padding: 60px 30px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        h1 {
-            color: #333;
+        .jumbotron::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
         }
 
-        p {
-            color: #666;
+        .jumbotron h1,
+        .jumbotron p {
+            position: relative;
+            z-index: 2;
+        }
+
+        .jumbotron h1 {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .jumbotron p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .jumbotron .btn {
+            background-color: #28a745;
+            border: none;
+            padding: 10px 20px;
             font-size: 18px;
-            line-height: 1.6;
+            z-index: 2;
+            position: relative;
+        }
+
+        .jumbotron .btn:hover {
+            background-color: #218838;
+        }
+
+        .features {
+            padding: 40px 20px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .feature-item img {
+            max-width: 100px;
             margin-bottom: 20px;
         }
 
-        button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
+        .feature-item h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .feature-item p {
             font-size: 16px;
-            transition: background-color 0.3s ease;
+            color: #6c757d;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        .footer {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
         }
 
-        .link {
-            margin-top: 20px;
+        .footer p {
+            margin: 0;
+        }
+
+        .footer a {
             color: #007bff;
             text-decoration: none;
         }
 
-        .link:hover {
-            text-decoration: underline;
+        .footer a:hover {
+            color: #0056b3;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Welcome to Our Website</h1>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla at turpis ac nisi vehicula mollis vel vel libero.</p>
-        <button>Learn More</button>
-        <div class="links">
-            <a href="{% url 'register' %}" class="link">Register</a>
-            <a href="{% url 'login' %}" class="link">Login</a>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">Vulnerability Scanner</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'scan' %}">Scan</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Jumbotron -->
+    <div class="jumbotron">
+        <div class="container">
+            <h1>Welcome to Vulnerability Scanner</h1>
+            <p>Your trusted tool for detecting and mitigating web vulnerabilities.</p>
+            <a href="{% url 'register' %}" class="btn btn-primary">Get Started</a>
         </div>
     </div>
+
+    <!-- Features Section -->
+    <div class="container features">
+        <div class="row">
+            <div class="col-md-4 feature-item">
+                <img src="https://cdn1.iconfinder.com/data/icons/law-28/512/Biometrics-fingerprint-investigate-scanning-512.png" alt="Scan Icon">
+                <h3>Easy Scanning</h3>
+                <p>Scan your website for vulnerabilities with a single click.</p>
+            </div>
+            <div class="col-md-4 feature-item">
+                <img src="" alt="Report Icon">
+                <h3>Comprehensive Reports</h3>
+                <p>Get detailed reports with actionable insights and mitigation strategies.</p>
+            </div>
+            <div class="col-md-4 feature-item">
+                <img src="" alt="Security Icon">
+                <h3>Enhanced Security</h3>
+                <p>Protect your website from common vulnerabilities and ensure its safety.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Vulnerability Scanner. All rights reserved.</p>
+            <p>Developed by Your Company.</p>
+            <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>

@@ -2,40 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Success</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
         .container {
-            max-width: 600px;
-            margin: 100px auto;
-            padding: 20px;
+            max-width: 400px;
+            padding: 30px;
             background-color: #fff;
-            border-radius: 5px;
+            border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         h1 {
-            margin-top: 0;
-            text-align: center;
             color: #333;
+            margin-top: 0;
         }
 
         p {
-            text-align: center;
+            margin-bottom: 20px;
         }
 
         .back-link {
             display: block;
             margin-top: 20px;
-            text-align: center;
             color: #007bff;
             text-decoration: none;
+            font-size: 1rem;
         }
 
         .back-link:hover {
@@ -44,11 +48,11 @@
     </style>
 </head>
 <body>
-    <div class="container text-center">
+    <div class="container">
         <h1>Payment Successful!</h1>
         <p>Your payment was successful and your premium status has been updated.</p>
     </div>
-    <a href="{% url 'scan' %}">Go to Dashboard</a>
+    <a href="{% url 'dashboard' %}">Go to Dashboard</a>
     <a href="{% url 'index' %}" class="back-link">Back to Home</a>
 </body>
 </html>

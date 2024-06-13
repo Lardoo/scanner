@@ -7,55 +7,96 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Roboto', sans-serif;
+            background: url('https://www.enterprisestorageforum.com/wp-content/uploads/2023/06/esf-vulnerability-scanning-and-management-696x453.png') no-repeat center center fixed;
+            background-size: cover;
             margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
         }
 
         .container {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 30px;
             max-width: 600px;
-            margin: 100px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
         }
 
         h1 {
-            margin-top: 0;
-            text-align: center;
-            color: #333;
+            font-size: 2rem;
+            margin-bottom: 1rem;
         }
 
         p {
-            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
         }
 
         .btn-primary {
-            display: block;
-            margin: 20px auto;
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
         }
 
         .back-link {
             display: block;
             margin-top: 20px;
-            text-align: center;
             color: #007bff;
             text-decoration: none;
+            font-size: 1rem;
         }
 
         .back-link:hover {
             text-decoration: underline;
         }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 0 10px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+
+            .btn-primary {
+                padding: 10px 15px;
+                font-size: 0.95rem;
+            }
+
+            .back-link {
+                font-size: 0.95rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container text-center">
+    <div class="container">
         <h1>Upgrade Required</h1>
         <p>You need to upgrade to a premium account to access the scan feature.</p>
         <a href="{% url 'paypal_create' %}" class="btn btn-primary">Upgrade to Premium</a>
+        <a href="{% url 'index' %}" class="back-link">Back to Home</a>
     </div>
-    <a href="{% url 'index' %}" class="back-link">Back to Home</a>
 </body>
 </html>

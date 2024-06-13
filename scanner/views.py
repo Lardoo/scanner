@@ -28,8 +28,11 @@ from django.utils.decorators import method_decorator
 from .models import Profile
 from .decorators import premium_required
 from django.utils.decorators import method_decorator
-
-
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from datetime import datetime
+from xhtml2pdf import pisa
+import io
 
 
 def index(request):
@@ -47,8 +50,8 @@ def profile(request):
 
 
 
-@login_required
-@premium_required
+#@login_required
+#@premium_required
 def scan(request):
     if request.method == 'POST':
         target_url = request.POST.get('target_url')
@@ -79,9 +82,32 @@ def scan(request):
             )
             scan_results.append(result)
 
-        return render(request, 'scan_results.html', {'scan_results': scan_results})
+        return render(request, 'scan_results.html', {
+            'scan_results': scan_results,
+            'scan_id': scan_results[0].id if scan_results else None  # Pass the scan ID
+        })
     
     return render(request, 'scan.html')
+
+
+
+
+
+@login_required
+@premium_required
+def download_scan_pdf(request):
+    scan_id = request.GET.get('scan_id')
+    scan_results = ScanResult.objects.filter(user=request.user, id=scan_id)
+
+    if not scan_results.exists():
+        return HttpResponse("No scan results found.", status=404)
+
+    html_string = render_to_string('scan_results_pdf.html', {'scan_results': scan_results})
+    pdf = HTML(string=html_string).write_pdf()
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="scan_results_{scan_id}.pdf"'
+    return response
 
 
 

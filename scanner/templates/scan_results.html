@@ -4,69 +4,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scan Results</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            background: url('https://www.enterprisestorageforum.com/wp-content/uploads/2023/06/esf-vulnerability-scanning-and-management-696x453.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
             margin: 0;
             padding: 0;
         }
+
         .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
+            background-color: rgba(0, 0, 0, 0.9);
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 800px;
+            margin: 40px auto;
+            color: #fff;
         }
+
         h1 {
-            color: #333;
-            margin-top: 0;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #007bff;
         }
-        ul {
-            list-style-type: none;
+
+        .scan-result {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .scan-result p {
+            margin: 0;
+            color: #fff;
+        }
+
+        .scan-result ul {
+            list-style: none;
             padding: 0;
+            margin: 0;
         }
-        li {
-            background-color: #f9f9f9;
-            border-radius: 4px;
+
+        .scan-result li {
             margin-bottom: 10px;
-            padding: 15px;
+            color: #fff;
         }
-        li p {
-            margin-top: 5px;
-            color: #666;
+
+        .scan-result li:first-child {
+            font-weight: bold;
+            color: #ff9800; /* Orange */
         }
+
+        .scan-result li:nth-child(2),
+        .scan-result li:nth-child(4) {
+            color: #4caf50; /* Green */
+        }
+
+        .scan-result li:nth-child(3),
+        .scan-result li:nth-child(5) {
+            color: #f44336; /* Red */
+        }
+
+        .scan-result li:nth-child(6) {
+            color: #2196f3; /* Blue */
+        }
+
         .back-link {
             display: block;
-            margin-top: 20px;
             text-align: center;
             color: #007bff;
             text-decoration: none;
+            margin-top: 20px;
         }
+
         .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .download-pdf {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .download-pdf a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .download-pdf a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Scan Results</h1>
-        <ul>
-            {% for result in scan_results %}
-                <li>
-                    
-                    <strong>{{ result.url }}</strong> - {{ result.vulnerability_type }}
-                    <p>{{ result.details }}</p>
-                    <p>{{ result.mitigation }}</p>
-                    <p>{{ result.payload }}</p>
-                  <p>{{ result.created_at }}</p>
-                    <p>{{ result.user_id }}</p>
-
-                </li>
-            {% endfor %}
-        </ul>
-        <a href="{% url 'dashboard' %}" class="back-link">Back to Dashboard</a>
+        <div class="scan-result">
+            <ul>
+                {% for result in scan_results %}
+                    <li style="color: #ff9800;">URL: {{ result.url }}</li>
+                    <li style="color: #4caf50;">Vulnerability Type: {{ result.vulnerability_type }}</li>
+                    <li style="color: #f44336;">Details: {{ result.details }}</li>
+                    <li style="color: #4caf50;">Mitigation: {{ result.mitigation }}</li>
+                    <li style="color: #2196f3;">Payload: {{ result.payload }}</li>
+                    <hr style="border-color: rgba(255, 255, 255, 0.3);">
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="download-pdf">
+            <a href="{% url 'download_scan_pdf' %}?scan_id={{ scan_id }}" class="btn download-link">Download PDF</a>
+        </div>
+        <a href="{% url 'scan' %}" class="back-link">Scan Another Target</a>
     </div>
 </body>
+
 </html>
