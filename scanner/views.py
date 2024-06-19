@@ -33,7 +33,9 @@ from weasyprint import HTML
 from datetime import datetime
 from xhtml2pdf import pisa
 import io
-
+from io import BytesIO
+from .models import FailedLoginAttempt
+from django.core.cache import cache  # For storing attempt count
 
 def index(request):
     return render(request,'index.html')
@@ -50,8 +52,8 @@ def profile(request):
 
 
 
-#@login_required
-#@premium_required
+@login_required
+@premium_required
 def scan(request):
     if request.method == 'POST':
         target_url = request.POST.get('target_url')
@@ -102,12 +104,22 @@ def download_scan_pdf(request):
     if not scan_results.exists():
         return HttpResponse("No scan results found.", status=404)
 
-    html_string = render_to_string('scan_results_pdf.html', {'scan_results': scan_results})
-    pdf = HTML(string=html_string).write_pdf()
+    # Render HTML template with all scan results
+    context = {'scan_results': scan_results}
+    template_path = 'scan_results_pdf.html'
+    html = render_to_string(template_path, context)
 
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="scan_results_{scan_id}.pdf"'
-    return response
+    # Create a PDF document
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
+
+    # Return PDF as response
+    if not pdf.err:
+        response = HttpResponse(result.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="scan_results_{scan_id}.pdf"'
+        return response
+
+    return HttpResponse("Error rendering PDF", status=500)
 
 
 
@@ -414,31 +426,61 @@ class RegisterView(View):
             return redirect('login')
         return render(request, 'register.html', {'form': form})
 
-# Login View with 2FA
+
+
+
+
+
+
 def login(request):
     if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                # Generate OTP and send via email
-                otp = generate_otp()
-                send_otp_email(user.email, otp)
-                # Store the OTP in the user's session for verification
-                request.session['otp'] = otp
-                request.session['user_id'] = user.id
-                return redirect('otp_verification')
-            else:
-                # Invalid credentials
-                return render(request, 'login.html', {'form': form, 'error': 'Invalid login credentials.'})
-    else:
-        form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        # Check if the IP address is already blocked
+        ip_address = request.META.get('REMOTE_ADDR')
+        blocked_key = f'blocked_{ip_address}'
+        if cache.get(blocked_key):
+            return render(request, 'blocked.html')  # Display a blocked page
+
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            auth_login(request, user)
+            # Clear any existing attempt count on successful login
+            attempt_key = f'login_attempts_{username}'
+            cache.delete(attempt_key)
+            # Generate OTP and send via email
+            otp = generate_otp()
+            send_otp_email(user.email, otp)
+            # Store the OTP in the user's session for verification
+            request.session['otp'] = otp
+            request.session['user_id'] = user.id
+            return redirect('otp_verification') # Redirect to home or desired page after login
+        else:
+            # Increment attempt count and check if user should be blocked
+            attempt_key = f'login_attempts_{username}'
+            attempts_left = 5 - cache.get(attempt_key, 0)
+            attempts_left -= 1  # Decrease attempts left after this attempt
+            cache.set(attempt_key, cache.get(attempt_key, 0) + 1, timeout=600)  # Timeout in seconds (10 minutes)
+
+            if attempts_left <= 0:
+                cache.set(blocked_key, True, timeout=600)  # Block IP for 10 minutes
+                return render(request, 'blocked.html')  # Display a blocked page
+
+            context = {
+                'attempts_left': attempts_left,
+                'username': username,
+            }
+            return render(request, 'login.html', context=context)
+
+    return render(request, 'login.html')
 
 
-# OTP Verification View
+
+
+
+
 def otp_verification(request):
     if request.method == 'POST':
         entered_otp = request.POST.get('otp')
@@ -446,15 +488,26 @@ def otp_verification(request):
             stored_otp = request.session.get('otp')
             user_id = request.session.get('user_id')
             if entered_otp == stored_otp and user_id:
-                # Match the entered OTP with the stored OTP
                 user = User.objects.get(pk=user_id)
                 auth_login(request, user)
                 del request.session['otp']
                 del request.session['user_id']
                 return redirect('dashboard')
             else:
+                attempt_key = f'otp_attempts_{user_id}'
+                attempts_left = 5 - cache.get(attempt_key, 0)
+                attempts_left -= 1
+                cache.set(attempt_key, cache.get(attempt_key, 0) + 1, timeout=600)
+
+                if attempts_left <= 0:
+                    ip_address = request.META.get('REMOTE_ADDR')
+                    blocked_key = f'blocked_{ip_address}'
+                    cache.set(blocked_key, True, timeout=600)
+                    return render(request, 'blocked.html')
+
                 error_message = 'Invalid OTP. Please try again.'
-                return render(request, 'otp_verification.html', {'error': error_message})
+                return render(request, 'otp_verification.html', {'error': error_message, 'attempts_left': attempts_left})
+
     return render(request, 'otp_verification.html')
 
 
@@ -464,6 +517,7 @@ def dashboard(request):
     return render(request, 'dashboard.html')
 
 # Logout View
+@login_required
 def logout(request):
     auth_logout(request)
     return redirect('login')
@@ -478,7 +532,7 @@ class PaypalPaymentView(View):
         return render(request, 'paypal_payment.html')
 
     def post(self, request, *args, **kwargs):
-        amount = 0.1  # Example amount
+        amount = 0.4  # Example amount
         # Construct return and cancel URLs
         return_url = request.build_absolute_uri('/paypal_execute/')
         cancel_url = request.build_absolute_uri('/paypal_cancel/')
@@ -562,6 +616,3 @@ class PaypalValidatePaymentView(APIView):
 # Payment Required View
 def payment_required_view(request):
     return render(request, 'payment_required.html')
-
-
-

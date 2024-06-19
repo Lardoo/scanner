@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Vulnerability Scanner</title>
+    <title>Home SQL Injection Vulnerability Scanner</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -16,7 +16,7 @@
         }
 
         .navbar {
-            background-color: #007bff;
+            background-color: #0a68cc;
         }
 
         .navbar-brand {
@@ -26,7 +26,7 @@
         }
 
         .navbar-nav .nav-link {
-            color: #fff;
+            color: #ffffff;
         }
 
         .navbar-nav .nav-link:hover {
@@ -144,7 +144,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'index' %}">Vulnerability Scanner</a>
+            <a class="navbar-brand" href="{% url 'index' %}">SWIFT FORENSICS COMPANY</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -152,17 +152,12 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        <a   style="color: #fff; font-size: large;"   class="nav-link" href="{% url 'register' %}">Register</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        <a  style="color: #fff; font-size: large;"  class="nav-link" href="{% url 'login' %}">Login</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'scan' %}">Scan</a>
-                    </li>
+
                 </ul>
             </div>
         </div>
@@ -186,12 +181,12 @@
                 <p>Scan your website for vulnerabilities with a single click.</p>
             </div>
             <div class="col-md-4 feature-item">
-                <img src="" alt="Report Icon">
+                <img src="https://cdn4.iconfinder.com/data/icons/infographics-chart-3/512/13-512.png" alt="Report Icon">
                 <h3>Comprehensive Reports</h3>
                 <p>Get detailed reports with actionable insights and mitigation strategies.</p>
             </div>
             <div class="col-md-4 feature-item">
-                <img src="" alt="Security Icon">
+                <img src="https://cdn0.iconfinder.com/data/icons/seo-web-4-1/128/Vigor_Shield-Protect-Security-Defense-Secure-512.png"  height="100" width="100"    alt="Security Icon">
                 <h3>Enhanced Security</h3>
                 <p>Protect your website from common vulnerabilities and ensure its safety.</p>
             </div>
@@ -202,9 +197,8 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; 2024 Vulnerability Scanner. All rights reserved.</p>
-            <p>Developed by Your Company.</p>
-            <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
-            <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+            <p>Developed by Swift Forensics Company</p>
+
         </div>
     </footer>
 

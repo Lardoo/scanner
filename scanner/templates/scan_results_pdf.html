@@ -7,8 +7,7 @@
         body {
             font-family: 'Arial', sans-serif;
             color: #000;
-            margin: 0;
-            padding: 20px;
+            margin: 20px;
         }
         h1 {
             text-align: center;
@@ -16,6 +15,10 @@
         }
         .scan-result {
             margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
         }
         .scan-result h2 {
             color: #ff6347;
@@ -36,19 +39,17 @@
     </style>
 </head>
 <body>
-    <h1>Comprehensive Scan Results Report</h1>
-    <p><strong>URL:</strong> {{ scan_results.0.url }}</p>
-    <p><strong>Total Vulnerabilities Found:</strong> {{ scan_results|length }}</p>
-    <hr>
-    <div>
+    <h1>Scan Results</h1>
+    <div class="container">
         {% for result in scan_results %}
         <div class="scan-result">
             <h2>{{ result.vulnerability_type }}</h2>
             <p class="details"><span>Details:</span> {{ result.details }}</p>
             <p class="mitigation"><span>Mitigation:</span> {{ result.mitigation }}</p>
+            {% if result.payload %}
             <p class="payload"><span>Payload:</span> {{ result.payload }}</p>
+            {% endif %}
         </div>
-        <hr>
         {% endfor %}
     </div>
 </body>
