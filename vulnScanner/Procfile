@@ -1,2 +1,2 @@
-web: gunicorn vulnScanner.wsgi --log-file -
+web: gunicorn scanner.wsgi --log-file -
 
