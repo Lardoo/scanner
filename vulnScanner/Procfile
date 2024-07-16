@@ -1,2 +1,2 @@
-web: gunicorn paxfulonline.wsgi --log-file -
+web: gunicorn vulnscanner.wsgi --log-file -
 
