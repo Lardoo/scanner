@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+
+
+    <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -83,6 +85,21 @@
         .back-link:hover {
             text-decoration: underline;
         }
+        #progress-container {
+            width: 100%;
+            background-color: #f3f3f3;
+            border: 1px solid #ddd;
+            padding: 5px;
+            display: none; /* Hide initially */
+        }
+        #progress-bar {
+            width: 0;
+            height: 30px;
+            background-color: #4caf50;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
     </style>
 </head>
 
@@ -99,6 +116,8 @@
         </form>
         <a href="{% url 'dashboard' %}" class="back-link">Back to Dashboard</a>
     </div>
+
+    
 </body>
 
 </html>

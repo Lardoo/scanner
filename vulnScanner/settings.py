@@ -15,6 +15,7 @@ import os
 
 from decouple import config
 
+
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'litwebtech.com' #
@@ -32,7 +33,8 @@ PAYPAL_BASE_URL = config('PAYPAL_BASE_URL')
 
 CSRF_TRUSTED_ORIGINS = [
       # Replace with your actual domain
-    'https://vulnerabilityscanner.serveo.net',  # Add this line
+    'https://vulnerabilityscanner.serveo.net', 
+    'https://f937-197-136-187-86.ngrok-free.app' # Add this line
 ]
 
 
@@ -49,7 +51,7 @@ SECRET_KEY = "django-insecure-1qy7+m6iyr-1&)-=qh2*50ee+_*pea_tx*_%dq0d*2nobyj37k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*","https://d39b668f137ad1491b48a0e2adac4fc2.serveo.net","127.0.0.1"]
+ALLOWED_HOSTS = ["*","https://f937-197-136-187-86.ngrok-free.app","127.0.0.1"]
 
 
 # Application definition
@@ -63,6 +65,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "scanner",
     "rest_framework"
+    
 ]
 
 MIDDLEWARE = [
@@ -73,6 +76,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "scanner.block_ip_middleware.BlockIPMiddleware",
 ]
 
 ROOT_URLCONF = "vulnScanner.urls"
@@ -94,6 +98,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "vulnScanner.wsgi.application"
+
+
+
+
+
+
 
 
 # Database

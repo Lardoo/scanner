@@ -36,6 +36,8 @@ import io
 from io import BytesIO
 from .models import FailedLoginAttempt
 from django.core.cache import cache  # For storing attempt count
+import time  # Add this to simulate long running tasks (remove in production)
+from django.http import JsonResponse
 
 def index(request):
     return render(request,'index.html')
@@ -408,8 +410,6 @@ def send_otp_email(email, otp):
     recipient_list = [email]
     send_mail(subject, message, from_email, recipient_list)
 
-
-
 # Registration View
 class RegisterView(View):
     def get(self, request):
@@ -422,21 +422,15 @@ class RegisterView(View):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
-            Profile.objects.get_or_create(user=user) # Create Profile object with default premium_status=False
+            Profile.objects.get_or_create(user=user)  # Create Profile object with default premium_status=False
             return redirect('login')
         return render(request, 'register.html', {'form': form})
-
-
-
-
-
-
 
 def login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
+
         # Check if the IP address is already blocked
         ip_address = request.META.get('REMOTE_ADDR')
         blocked_key = f'blocked_{ip_address}'
@@ -444,7 +438,7 @@ def login(request):
             return render(request, 'blocked.html')  # Display a blocked page
 
         user = authenticate(request, username=username, password=password)
-        
+
         if user is not None:
             auth_login(request, user)
             # Clear any existing attempt count on successful login
@@ -456,16 +450,16 @@ def login(request):
             # Store the OTP in the user's session for verification
             request.session['otp'] = otp
             request.session['user_id'] = user.id
-            return redirect('otp_verification') # Redirect to home or desired page after login
+            return redirect('otp_verification')  # Redirect to OTP verification after login
         else:
             # Increment attempt count and check if user should be blocked
             attempt_key = f'login_attempts_{username}'
             attempts_left = 5 - cache.get(attempt_key, 0)
             attempts_left -= 1  # Decrease attempts left after this attempt
-            cache.set(attempt_key, cache.get(attempt_key, 0) + 1, timeout=600)  # Timeout in seconds (10 minutes)
+            cache.set(attempt_key, cache.get(attempt_key, 0) + 1, timeout=300)  # Timeout in seconds (5 minutes)
 
             if attempts_left <= 0:
-                cache.set(blocked_key, True, timeout=600)  # Block IP for 10 minutes
+                cache.set(blocked_key, True, timeout=300)  # Block IP for 5 minutes
                 return render(request, 'blocked.html')  # Display a blocked page
 
             context = {
@@ -476,11 +470,7 @@ def login(request):
 
     return render(request, 'login.html')
 
-
-
-
-
-
+@login_required
 def otp_verification(request):
     if request.method == 'POST':
         entered_otp = request.POST.get('otp')
@@ -488,10 +478,9 @@ def otp_verification(request):
             stored_otp = request.session.get('otp')
             user_id = request.session.get('user_id')
             if entered_otp == stored_otp and user_id:
-                user = User.objects.get(pk=user_id)
-                auth_login(request, user)
+                # Mark OTP as verified in session
+                request.session['otp_verified'] = True
                 del request.session['otp']
-                del request.session['user_id']
                 return redirect('dashboard')
             else:
                 attempt_key = f'otp_attempts_{user_id}'
@@ -508,20 +497,25 @@ def otp_verification(request):
                 error_message = 'Invalid OTP. Please try again.'
                 return render(request, 'otp_verification.html', {'error': error_message, 'attempts_left': attempts_left})
 
+    # If user tries to access OTP verification without logging in first
+    if not request.session.get('otp'):
+        return redirect('login')
+
     return render(request, 'otp_verification.html')
 
-
-# Dashboard View
 @login_required
 def dashboard(request):
+    # Ensure user has completed OTP verification
+    if not request.session.get('otp_verified'):
+        return redirect('otp_verification')
     return render(request, 'dashboard.html')
 
-# Logout View
 @login_required
 def logout(request):
     auth_logout(request)
+    # Clear the OTP verified session flag
+    request.session.flush()
     return redirect('login')
-
 
 
 
@@ -532,7 +526,7 @@ class PaypalPaymentView(View):
         return render(request, 'paypal_payment.html')
 
     def post(self, request, *args, **kwargs):
-        amount = 0.4  # Example amount
+        amount = 0.5  # Example amount
         # Construct return and cancel URLs
         return_url = request.build_absolute_uri('/paypal_execute/')
         cancel_url = request.build_absolute_uri('/paypal_cancel/')
