@@ -110,14 +110,16 @@ WSGI_APPLICATION = "vulnScanner.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-     'default': {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'scannerdb',
-        'USER': 'postgres',
-        'PASSWORD': 'Anonymous',
-        'HOST': 'localhost',
-        'PORT': '5432'
-       
+        'NAME': 'neondb',
+        'USER': 'neondb_owner',
+        'PASSWORD': '6CjhRQel8Ztm',
+        'HOST': 'ep-weathered-snow-a5s0dwn1.us-east-2.aws.neon.tech',
+        'PORT': '5432',
+        'OPTIONS': {
+      'sslmode': 'require',
+    },
     }
 }
 
