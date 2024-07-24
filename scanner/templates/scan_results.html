@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="https://cdn1.iconfinder.com/data/icons/law-28/512/Biometrics-fingerprint-investigate-scanning-512.png" />
     <title>Scan Results</title>
     <style>
         body {
@@ -71,6 +72,9 @@
     <!-- Download PDF Button -->
     <div class="download-pdf">
         <a href="{% url 'download_scan_pdf' %}?scan_id={{ scan_id }}" class="btn">Download PDF</a>
+    </div>
+    <div class="download-pdf">
+        <a href="{% url 'scan' %}" >Scan another URL</a>
     </div>
 </body>
 </html>

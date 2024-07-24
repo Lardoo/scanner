@@ -11,7 +11,12 @@ class ScanResult(models.Model):
     details = models.TextField()
     mitigation = models.TextField()
     payload = models.TextField(null=True, blank=True)
+    scan_id = models.CharField(max_length=255, blank=True)  # Add this field
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.vulnerability_type} at {self.url}"
+    
 
 
 class Profile(models.Model):

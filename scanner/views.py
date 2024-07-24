@@ -61,17 +61,26 @@ def scan(request):
         target_url = request.POST.get('target_url')
         deep_scan = request.POST.get('deep_scan') == 'on'
         
-        # Collect endpoints via crawling if deep scan is enabled
+        # Generate a unique scan ID
+        scan_id = f"scan_{request.user.id}_{int(time.time())}"
+        
+        # Initialize progress in cache
+        cache.set(scan_id, {'status': 'Initializing', 'progress': 0})
+        
+        # Start the scan (this should be done asynchronously in a real-world scenario)
         if deep_scan:
             endpoints = crawl_website(target_url)
         else:
-            endpoints = [target_url]  # Just scan the provided URL
+            endpoints = [target_url]
         
         vulnerabilities = []
+        total_endpoints = len(endpoints)
         
-        # Scan each endpoint for SQL injection vulnerabilities
-        for endpoint in endpoints:
+        for index, endpoint in enumerate(endpoints):
             vulnerabilities.extend(detect_sql_injection(endpoint))
+            # Update progress in cache
+            progress = int(((index + 1) / total_endpoints) * 100)
+            cache.set(scan_id, {'status': 'Scanning', 'progress': progress})
         
         # Save scan results to the database
         scan_results = []
@@ -81,27 +90,36 @@ def scan(request):
                 vulnerability_type=vulnerability['type'],
                 details=vulnerability['details'],
                 mitigation=vulnerability['mitigation'],
-                payload=vulnerability.get('payload', None),  # Include payload if available
-                user=request.user  # Assign the current user to the scan result
+                payload=vulnerability.get('payload', None),
+                user=request.user,
+                scan_id=scan_id  # Save scan_id
             )
             scan_results.append(result)
-
-        return render(request, 'scan_results.html', {
-            'scan_results': scan_results,
-            'scan_id': scan_results[0].id if scan_results else None  # Pass the scan ID
-        })
+        
+        # Finalize progress
+        cache.set(scan_id, {'status': 'Complete', 'progress': 100, 'results': [result.id for result in scan_results]})
+        
+        return JsonResponse({'scan_id': scan_id})
     
     return render(request, 'scan.html')
 
 
+@login_required
+def scan_progress(request, scan_id):
+    progress = cache.get(scan_id, {'status': 'Unknown', 'progress': 0})
+    return JsonResponse(progress)
 
 
 
 @login_required
-@premium_required
 def download_scan_pdf(request):
     scan_id = request.GET.get('scan_id')
-    scan_results = ScanResult.objects.filter(user=request.user, id=scan_id)
+
+    if not scan_id:
+        return HttpResponse("Scan ID is required.", status=400)
+
+    # Fetch scan results based on scan_id
+    scan_results = ScanResult.objects.filter(user=request.user, scan_id=scan_id)
 
     if not scan_results.exists():
         return HttpResponse("No scan results found.", status=404)
@@ -125,10 +143,17 @@ def download_scan_pdf(request):
 
 
 
-# Scan Results  View
+
 @login_required
-def scan_results(request):
-    return render(request, 'scan_results.html')
+def scan_results(request, scan_id):
+    scan_results = ScanResult.objects.filter(user=request.user, scan_id=scan_id)
+
+    if not scan_results.exists():
+        return HttpResponse("No scan results found.", status=404)
+
+    context = {'scan_results': scan_results, 'scan_id': scan_id}
+    return render(request, 'scan_results.html', context)
+
 
 
 
