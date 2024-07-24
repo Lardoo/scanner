@@ -42,6 +42,12 @@
             margin-bottom: 15px;
         }
 
+        .success-message {
+            color: #5bc0de;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
         form {
             display: flex;
             flex-direction: column;
@@ -103,6 +109,36 @@
             margin-bottom: 15px;
         }
 
+        .resend-button {
+            background-color: #fff;
+            color: #007bff;
+            border: 1px solid #007bff;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: not-allowed;
+            font-size: 1rem;
+            margin-top: 15px;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .resend-button:disabled {
+            background-color: #f1f1f1;
+            border-color: #d3d3d3;
+            color: #aaa;
+        }
+
+        .resend-button:not(:disabled) {
+            background-color: #d9534f;
+            color: #fff;
+            border-color: #d9534f;
+            cursor: pointer;
+        }
+
+        .resend-button:not(:disabled):hover {
+            background-color: #c9302c;
+            border-color: #c9302c;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -122,14 +158,23 @@
                 padding: 8px;
                 font-size: 0.95rem;
             }
+
+            .resend-button {
+                padding: 8px;
+                font-size: 0.95rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>OTP Verification</h1>
+        <h1>Verify your identity</h1>
+        <h4 style="color: green;">Please provide the code sent to your email. The OTP is only valid for 5 minutes.</h4>
         {% if error %}
             <p style="color: red;" class="error-message">{{ error }}</p>
+        {% endif %}
+        {% if success %}
+            <p style="color: #5bc0de;" class="success-message">OTP has been resent to your email.</p>
         {% endif %}
         {% if attempts_left %}
             <p style="color: red;" class="attempts-left">{{ attempts_left }} attempts left</p>
@@ -140,7 +185,55 @@
             <input type="text" id="otp" name="otp" required>
             <button type="submit">Verify</button>
         </form>
-        <a href="{% url 'index' %}" class="back-link">Back to Home</a>
+        <button id="resend-button" class="resend-button" disabled>Resend OTP</button>
+        <a href="{% url 'login' %}" class="back-link">Back to Login</a>
     </div>
+
+    <script>
+        // Function to enable the Resend OTP button after 3 minutes
+        function enableResendButton() {
+            const resendButton = document.getElementById('resend-button');
+            const resendMessage = document.querySelector('.success-message');
+            let timer = 180; // 3 minutes in seconds
+
+            const interval = setInterval(() => {
+                if (timer <= 0) {
+                    clearInterval(interval);
+                    resendButton.disabled = false;
+                    resendButton.innerText = 'Resend OTP';
+                } else {
+                    timer--;
+                    resendButton.innerText = `Resend OTP in ${Math.floor(timer / 60)}:${('0' + (timer % 60)).slice(-2)}`;
+                }
+            }, 1000);
+        }
+
+        // Call the function to start the countdown
+        enableResendButton();
+
+        // Handle Resend OTP button click
+        document.getElementById('resend-button').addEventListener('click', function() {
+            // Make an AJAX request to the server to resend the OTP
+            fetch('{% url "resend_otp" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+            }).then(response => response.json()).then(data => {
+                if (data.success) {
+                    // Restart the countdown and show success message
+                    this.disabled = true;
+                    enableResendButton();
+                    document.querySelector('.success-message').innerText = 'OTP has been resent to your email.';
+                } else {
+                    alert('Failed to resend OTP. Please try again later.');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('OTP has been resent to your email.');
+            });
+        });
+    </script>
 </body>
 </html>

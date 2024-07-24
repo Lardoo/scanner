@@ -21,4 +21,5 @@ urlpatterns = [
     path('download_scan_pdf/', views.download_scan_pdf, name='download_scan_pdf'),
     path('scan/progress/<str:scan_id>/', views.scan_progress, name='scan_progress'),
     path('scan/results/<str:scan_id>/', views.scan_results, name='scan_results'),
+    path('resend_otp/', views.resend_otp, name='resend_otp'),
 ]

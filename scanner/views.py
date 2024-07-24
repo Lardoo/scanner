@@ -30,7 +30,7 @@ from .decorators import premium_required
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from weasyprint import HTML
-from datetime import datetime
+from datetime import datetime,timedelta
 from xhtml2pdf import pisa
 import io
 from io import BytesIO
@@ -38,6 +38,9 @@ from .models import FailedLoginAttempt
 from django.core.cache import cache  # For storing attempt count
 import time  # Add this to simulate long running tasks (remove in production)
 from django.http import JsonResponse
+from django.utils import timezone
+from django.views.decorators.http import require_POST
+
 
 def index(request):
     return render(request,'index.html')
@@ -451,6 +454,7 @@ class RegisterView(View):
             return redirect('login')
         return render(request, 'register.html', {'form': form})
 
+
 def login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -472,8 +476,9 @@ def login(request):
             # Generate OTP and send via email
             otp = generate_otp()
             send_otp_email(user.email, otp)
-            # Store the OTP in the user's session for verification
+            # Store the OTP and its timestamp in the user's session for verification
             request.session['otp'] = otp
+            request.session['otp_timestamp'] = timezone.now().isoformat()
             request.session['user_id'] = user.id
             return redirect('otp_verification')  # Redirect to OTP verification after login
         else:
@@ -501,32 +506,53 @@ def otp_verification(request):
         entered_otp = request.POST.get('otp')
         if entered_otp:
             stored_otp = request.session.get('otp')
+            otp_timestamp_str = request.session.get('otp_timestamp')
             user_id = request.session.get('user_id')
-            if entered_otp == stored_otp and user_id:
-                # Mark OTP as verified in session
-                request.session['otp_verified'] = True
-                del request.session['otp']
-                return redirect('dashboard')
-            else:
-                attempt_key = f'otp_attempts_{user_id}'
-                attempts_left = 5 - cache.get(attempt_key, 0)
-                attempts_left -= 1
-                cache.set(attempt_key, cache.get(attempt_key, 0) + 1, timeout=600)
+            if stored_otp and otp_timestamp_str and user_id:
+                otp_timestamp = datetime.fromisoformat(otp_timestamp_str)
+                if entered_otp == stored_otp and timezone.now() < otp_timestamp + timedelta(minutes=5):
+                    # Mark OTP as verified in session
+                    request.session['otp_verified'] = True
+                    del request.session['otp']
+                    del request.session['otp_timestamp']
+                    return redirect('dashboard')
+                else:
+                    attempt_key = f'otp_attempts_{user_id}'
+                    attempts_left = 5 - cache.get(attempt_key, 0)
+                    attempts_left -= 1
+                    cache.set(attempt_key, cache.get(attempt_key, 0) + 1, timeout=600)
 
-                if attempts_left <= 0:
-                    ip_address = request.META.get('REMOTE_ADDR')
-                    blocked_key = f'blocked_{ip_address}'
-                    cache.set(blocked_key, True, timeout=600)
-                    return render(request, 'blocked.html')
+                    if attempts_left <= 0:
+                        ip_address = request.META.get('REMOTE_ADDR')
+                        blocked_key = f'blocked_{ip_address}'
+                        cache.set(blocked_key, True, timeout=600)
+                        return render(request, 'blocked.html')
 
-                error_message = 'Invalid OTP. Please try again.'
-                return render(request, 'otp_verification.html', {'error': error_message, 'attempts_left': attempts_left})
+                    error_message = 'Invalid OTP or OTP has expired. Please try again.'
+                    return render(request, 'otp_verification.html', {'error': error_message, 'attempts_left': attempts_left})
 
     # If user tries to access OTP verification without logging in first
     if not request.session.get('otp'):
         return redirect('login')
 
     return render(request, 'otp_verification.html')
+
+
+
+
+
+
+@login_required
+@require_POST
+def resend_otp(request):
+    user = request.user
+    otp = generate_otp()
+    send_otp_email(user.email, otp)
+    request.session['otp'] = otp
+    request.session['otp_timestamp'] = timezone.now().isoformat()
+    return JsonResponse({'success': True})
+
+
 
 @login_required
 def dashboard(request):
