@@ -22,4 +22,8 @@ urlpatterns = [
     path('scan/progress/<str:scan_id>/', views.scan_progress, name='scan_progress'),
     path('scan/results/<str:scan_id>/', views.scan_results, name='scan_results'),
     path('resend_otp/', views.resend_otp, name='resend_otp'),
+    path('reset-password/', views.reset_password_request, name='reset_password_request'),
+    path('verify-otp/', views.verify_otp, name='verify_otp'),
+    path('reset-password-confirm/', views.reset_password_confirm, name='reset_password_confirm'),
+    path('resend_otp_password/', views.resend_otp_password, name='resend_otp_password'),
 ]

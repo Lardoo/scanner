@@ -40,6 +40,7 @@ import time  # Add this to simulate long running tasks (remove in production)
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from django.urls import reverse
 
 
 def index(request):
@@ -495,6 +496,7 @@ def login(request):
             context = {
                 'attempts_left': attempts_left,
                 'username': username,
+    
             }
             return render(request, 'login.html', context=context)
 
@@ -568,6 +570,106 @@ def logout(request):
     request.session.flush()
     return redirect('login')
 
+
+
+
+def reset_password_request(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if email:
+            try:
+                user = User.objects.get(email=email)
+                otp = generate_otp()
+                request.session['reset_password_email'] = email
+                request.session['reset_password_otp'] = otp
+                request.session['reset_password_otp_time'] = timezone.now().isoformat()
+                send_otp_email(email, otp)
+                messages.success(request, 'An OTP has been sent to your email.')
+                return redirect(reverse('verify_otp'))
+            except User.DoesNotExist:
+                messages.error(request, 'User with this email does not exist.')
+    return render(request, 'reset_password_request.html')
+
+def verify_otp(request):
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        if entered_otp:
+            stored_otp = request.session.get('reset_password_otp')
+            otp_timestamp_str = request.session.get('reset_password_otp_time')
+            email = request.session.get('reset_password_email')
+
+            if stored_otp and otp_timestamp_str and email:
+                try:
+                    otp_timestamp = datetime.fromisoformat(otp_timestamp_str)
+
+                    if entered_otp == stored_otp and timezone.now() < otp_timestamp + timedelta(minutes=5):
+                        # OTP is valid
+                        request.session['otp_verified'] = True
+                        request.session.pop('reset_password_otp', None)
+                        request.session.pop('reset_password_otp_time', None)
+                        return redirect('reset_password_confirm')
+
+                    else:
+                        # OTP is invalid or expired
+                        attempt_key = f'otp_attempts_{email}'
+                        attempts_left = 5 - cache.get(attempt_key, 0)
+                        attempts_left -= 1
+                        cache.set(attempt_key, cache.get(attempt_key, 0) + 1, timeout=600)
+
+                        if attempts_left <= 0:
+                            ip_address = request.META.get('REMOTE_ADDR')
+                            blocked_key = f'blocked_{ip_address}'
+                            cache.set(blocked_key, True, timeout=600)
+                            return render(request, 'blocked.html')
+
+                        messages.error(request, 'Invalid OTP or OTP has expired. Please try again.')
+                        return render(request, 'verify_otp.html', {'attempts_left': attempts_left})
+
+                except ValueError:
+                    messages.error(request, 'An error occurred while processing the OTP. Please try again.')
+
+    # If OTP session is not set
+    if not request.session.get('reset_password_otp'):
+        return redirect('reset_password_request')
+
+    return render(request, 'verify_otp.html')
+
+# otp password resend request
+def resend_otp_password(request):
+    email = request.session.get('reset_password_email')
+    if email:
+        otp = generate_otp()
+        request.session['reset_password_otp'] = otp
+        request.session['reset_password_otp_time'] = timezone.now().isoformat()
+        send_otp_email(email, otp)
+        messages.success(request, 'A new OTP has been sent to your email.')
+    return redirect(reverse('verify_otp'))
+
+def reset_password_confirm(request):
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+        email = request.session.get('reset_password_email')
+        
+        if password and confirm_password:
+            if password != confirm_password:
+                messages.error(request, 'Passwords do not match.')
+                return render(request, 'reset_password_confirm.html')
+
+            if email:
+                try:
+                    user = User.objects.get(email=email)
+                    user.set_password(password)
+                    user.save()
+                    messages.success(request, 'Password has been reset successfully.')
+                    return redirect(reverse('login'))
+                except User.DoesNotExist:
+                    messages.error(request, 'User with this email does not exist.')
+                    return redirect(reverse('reset_password_request'))
+        else:
+            messages.error(request, 'Please fill out both password fields.')
+    
+    return render(request, 'reset_password_confirm.html')
 
 
 @method_decorator(login_required, name='dispatch')
