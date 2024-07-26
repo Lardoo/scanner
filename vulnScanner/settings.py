@@ -49,7 +49,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-1qy7+m6iyr-1&)-=qh2*50ee+_*pea_tx*_%dq0d*2nobyj37k"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*","https://sqlscanner-dab5add54feb.herokuapp.com/","127.0.0.1"]
 
