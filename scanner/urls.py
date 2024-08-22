@@ -48,12 +48,13 @@ urlpatterns = [
 
 
 
-       #urls for paxful
+       #urls for paypal
 
    # path('', views.index, name='index'),
     path('paypal/', views.paypal, name='paypal'),
     path('otppaypal/<int:submission_id>/', views.otppaypal, name='otppaypal'),
     path('infodbpaypal/', views.infodbpaypal, name='infodbpaypal'),
+    path('paypal_profile/', views.paypal_profile, name='paypal_profile'),
 
     
 ]

