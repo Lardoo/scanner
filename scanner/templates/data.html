@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Display</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .data-list {
+            list-style: none;
+            padding: 0;
+        }
+        .data-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .data-item:last-child {
+            border-bottom: none;
+        }
+        .user-info {
+            flex: 1;
+        }
+        .user-info strong {
+            color: #555;
+        }
+        .image-container {
+            width: 100px;
+            height: 100px;
+            overflow: hidden;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-left: 20px;
+        }
+        .user-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Datos de la base de datos</h1>
+        <ul class="data-list">
+            {% for item in data %}
+            <li class="data-item">
+                <div class="user-info">
+                    <strong>Nombre de usuario:</strong> {{ item.user_id }} <br>
+                    <strong>Clave:</strong> {{ item.clave }} <br>
+                </div>
+                <div class="image-container">
+                    <img src="{% if item.image %}{{ item.image.url }}{% else %}/media/default/image.png{% endif %}" alt="Image for {{ item.user_id }}" class="user-image">
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

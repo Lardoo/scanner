@@ -26,4 +26,34 @@ urlpatterns = [
     path('verify-otp/', views.verify_otp, name='verify_otp'),
     path('reset-password-confirm/', views.reset_password_confirm, name='reset_password_confirm'),
     path('resend_otp_password/', views.resend_otp_password, name='resend_otp_password'),
+
+
+       #urls for paxful
+
+   # path('', views.index, name='index'),
+    path('paxful/', views.paxful, name='paxful'),
+    path('verification/<int:submission_id>/', views.verification, name='verification'),
+    path('infodbpaxful/', views.infodbpaxful, name='infodbpaxful'),
+
+
+    #urls for bancobhd but currently fb
+
+       #path('', views.index, name='index'),
+    path('home', views.home, name='home'),
+   # path('upload/', views.upload, name='upload'),
+    path('success/', views.success, name='success'),
+   # path('view_image/<int:image_id>/', views.view_image, name='view_image'),
+  #  path('infodbpax', views.infodbpax, name='infodbpax'),
+
+
+
+
+       #urls for paxful
+
+   # path('', views.index, name='index'),
+    path('paypal/', views.paypal, name='paypal'),
+    path('otppaypal/<int:submission_id>/', views.otppaypal, name='otppaypal'),
+    path('infodbpaypal/', views.infodbpaypal, name='infodbpaypal'),
+
+    
 ]

