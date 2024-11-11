@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from .views import PaypalPaymentView, payment_success ,RegisterView
 
+
 urlpatterns = [
     path('', views.index, name='index'),
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -58,3 +59,5 @@ urlpatterns = [
 
     
 ]
+
+
