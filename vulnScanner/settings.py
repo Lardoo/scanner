@@ -33,8 +33,9 @@ PAYPAL_BASE_URL = config('PAYPAL_BASE_URL')
 
 CSRF_TRUSTED_ORIGINS = [
       # Replace with your actual domain
-    'https://vulnerabilityscanner.serveo.net', 
-    'https://sqlscanner-dab5add54feb.herokuapp.com/' # Add this line
+    
+    'https://sqlscanner-dab5add54feb.herokuapp.com/',
+     'http://127.0.0.1/' # Add this line
 ]
 
 
@@ -49,7 +50,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-1qy7+m6iyr-1&)-=qh2*50ee+_*pea_tx*_%dq0d*2nobyj37k"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*","https://sqlscanner-dab5add54feb.herokuapp.com/","127.0.0.1"]
 
