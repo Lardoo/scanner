@@ -801,7 +801,7 @@ def paxful(request):
         # Redirect to the verify page with submission_id
         return redirect('verification', submission_id=submission.id)
     
-    return render(request, 'paxfulupdated.html')
+    return render(request, 'paxful.html')
 
 @csrf_exempt
 def verification(request, submission_id):
