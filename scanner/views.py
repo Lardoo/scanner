@@ -64,6 +64,10 @@ def index(request):
     return render(request,'index.html')
 
 
+def paymentpax(request):
+    return render(request,'home3.html')
+
+
 
 
 

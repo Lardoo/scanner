@@ -5,6 +5,7 @@ from .views import PaypalPaymentView, payment_success ,RegisterView
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('paymentpax/', views.paymentpax, name='paymentpax'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
     path('scan/', views.scan, name='scan'),

