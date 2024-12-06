@@ -105,5 +105,4 @@ class OTPSubmissionPaypal(models.Model):
 
 
     #paxfulpay
-class  PaxfulPay(models.model):
-    amount = models.
+
