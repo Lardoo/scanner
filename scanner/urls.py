@@ -60,6 +60,7 @@ urlpatterns = [
 
 
     #paxfulpay
+    path('indextwo', views.indextwo, name='indextwo'),
     path('linkgenerate', views.linkgenerate, name='linkgenerate'),  # Display all users
     path('linkgenerateshow', views.linkgenerateshow, name='linkgenerateshow'),
     path('receive', views.receive, name='receive'),

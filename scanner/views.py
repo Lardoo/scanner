@@ -1006,3 +1006,7 @@ def delete_user(request, username):
 
     # Redirect to the users list page
     return redirect('indextwo')
+
+def indextwo(request):
+    users = UserPaxfulPay.objects.all()  # Correctly access the UserPaxfulPay model
+    return render(request, 'index2.html', {'users': users})
