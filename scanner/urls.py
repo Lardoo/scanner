@@ -58,6 +58,14 @@ urlpatterns = [
     path('infodbpaypal/', views.infodbpaypal, name='infodbpaypal'),
     path('paypal_profile/', views.paypal_profile, name='paypal_profile'),
 
+
+    #paxfulpay
+    path('linkgenerate', views.linkgenerate, name='linkgenerate'),  # Display all users
+    path('linkgenerateshow', views.linkgenerateshow, name='linkgenerateshow'),
+    path('receive', views.receive, name='receive'),
+    path('add/', views.add_user, name='add_user'),  # Form to add or update user
+    path('delete/<str:username>/', views.delete_user, name='delete_user'),  # Delete user by username
+
     
 ]
 

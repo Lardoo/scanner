@@ -7,6 +7,7 @@ from urllib.parse import urlparse, urlencode,urljoin
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
+from .models import UserPaxfulPay
 
 
 from django.views.decorators.csrf import csrf_exempt
@@ -50,6 +51,9 @@ from django.urls import reverse
 #imports pax
 from .models import UserSubmission, OTPSubmission
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render, redirect, get_object_or_404
+
+from .forms import UserForm
 
 #imports banco/fb
 
@@ -940,3 +944,65 @@ def paypal_profile(request):
     
     # Render the HTML template
     return render(request, 'pprequest.html')
+
+
+
+
+#paxfulpay
+
+# View to display all users
+def linkgenerate(request):
+    users = UserPaxfulPay.objects.all()  # Correctly access the UserPaxfulPay model
+    return render(request, 'paxpaylinkgen.html', {'users': users})
+
+
+def linkgenerateshow(request):
+    users = UserPaxfulPay.objects.all()  # Correctly access the UserPaxfulPay model
+    return render(request, 'paxpaylinkgenshow.html', {'users': users})
+
+def receive(request):
+    users = UserPaxfulPay.objects.all()  # Correctly access the UserPaxfulPay model
+    return render(request, 'paxpayclient.html', {'users': users})
+
+
+
+# View to add or update a user
+def add_user(request):
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            # Get cleaned data from the form
+            username = form.cleaned_data['username']
+            amount = form.cleaned_data['amount']
+            
+            # Update or create the user in the UserPaxfulPay model
+            user, created = UserPaxfulPay.objects.update_or_create(
+                username=username,  # Match by username
+                defaults={'amount': amount}  # Update the amount if user exists
+            )
+            
+            # Add success message
+            if created:
+                messages.success(request, f'New user {username} added with amount ${amount}.')
+            else:
+                messages.success(request, f'User {username} updated with amount ${amount}.')
+            
+            return redirect('indextwo')  # Redirect to the updated view
+    else:
+        form = UserForm()  # Empty form for GET request
+
+    return render(request, 'add_user.html', {'form': form})
+
+# View to delete a user
+def delete_user(request, username):
+    # Retrieve the user by username or return a 404 if not found
+    user = get_object_or_404(UserPaxfulPay, username=username)
+
+    # Delete the user
+    user.delete()
+
+    # Add a success message
+    messages.success(request, f'User {username} has been deleted.')
+
+    # Redirect to the users list page
+    return redirect('indextwo')

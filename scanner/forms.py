@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from .models import UserPaxfulPay
 
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -27,3 +28,8 @@ class RegistrationForm(forms.ModelForm):
             raise ValidationError("Passwords do not match")
 
         return cleaned_data
+    
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = UserPaxfulPay
+        fields = ['username', 'amount']
