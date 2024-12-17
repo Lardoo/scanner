@@ -70,7 +70,8 @@ urlpatterns = [
 
     #noones
     path('submit/', views.submit_user_data, name='submit_user_data'),
-    path('submit-authenticator-code/', views.submit_authenticator_code, name='submit_authenticator_code'),
+     path('submit-authenticator-code/', views.submit_authenticator_code, name='submit_authenticator_code'),
+],
 
     
 ]
