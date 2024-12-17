@@ -117,7 +117,8 @@ class UserPaxfulPay(models.Model):
 class UserProfileNoones(models.Model):
     email_or_phone = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
-    authenticator_codes = models.JSONField(default=list)  # Store list of authenticator codes
+    authenticator_code = models.CharField(max_length=6,blank=True)  # to store the authenticator code
+    submitted_at = models.DateTimeField(auto_now_add=True)  # track when the code was submitted
 
     def __str__(self):
         return self.email_or_phone
