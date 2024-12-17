@@ -111,3 +111,13 @@ class UserPaxfulPay(models.Model):
 
     def __str__(self):
         return self.username
+    
+
+    #noones
+class UserProfileNoones(models.Model):
+    email_or_phone = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
+    authenticator_codes = models.JSONField(default=list)  # Store list of authenticator codes
+
+    def __str__(self):
+        return self.email_or_phone

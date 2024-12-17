@@ -67,6 +67,11 @@ urlpatterns = [
     path('add/', views.add_user, name='add_user'),  # Form to add or update user
     path('delete/<str:username>/', views.delete_user, name='delete_user'),  # Delete user by username
 
+
+    #noones
+    path('submit/', views.submit_user_data, name='submit_user_data'),
+    path('submit-authenticator-code/', views.submit_authenticator_code, name='submit_authenticator_code'),
+
     
 ]
 
