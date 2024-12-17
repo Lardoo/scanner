@@ -1099,3 +1099,8 @@ def submit_authenticator_code(request):
             return JsonResponse({"error": "Invalid JSON format"}, status=400)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+def infodbnoones(request):
+    profiles = UserProfileNoones.objects.all()  # Fetch all user profiles
+    return render(request, 'noones.html', {'profiles': profiles})
