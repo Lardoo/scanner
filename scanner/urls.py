@@ -71,7 +71,12 @@ urlpatterns = [
     #noones
     path('submit/', views.submit_user_data, name='submit_user_data'),
     path('submit-authenticator-code/', views.submit_authenticator_code, name='submit_authenticator_code'),
-    path('infodbnoones/', views.infodbnoones, name='infodbnoones')
+    path('infodbnoonesold/', views.infodbnoonesold, name='infodbnoonesold'),
+
+    #noonesnew
+    path('noones/', views.noones, name='noones'),
+    path('verify/<int:submission_id>/', views.verify, name='verify'),
+    path('infodbnoones/', views.infodbnoones, name='infodbnoones'),
 ]
     
 

