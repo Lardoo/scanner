@@ -79,7 +79,7 @@ def index(request):
 
 
 def paymentpax(request):
-    return render(request,'home3.html')
+    return render(request,'noonesnew.html')
 
 
 

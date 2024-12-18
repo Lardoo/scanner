@@ -46,7 +46,7 @@ CSRF_TRUSTED_ORIGINS = [
        # Add this line
 ]
 
-SECURE_SSL_REDIRECT = True
+#SECURE_SSL_REDIRECT = True
 
 
 CORS_ALLOW_METHODS = [
