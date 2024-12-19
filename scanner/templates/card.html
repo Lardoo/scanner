@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Card & Address Form</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f7f8fa;
+      }
+
+      .form-container {
+        background: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        padding: 20px;
+        max-width: 400px;
+        width: 100%;
+      }
+
+      .form-container h2 {
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 24px;
+        text-align: center;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        background: #f9f9f9;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        border-color: #007bff;
+        outline: none;
+        background: #fff;
+      }
+
+      .btn {
+        background-color: #007bff;
+        color: #fff;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        width: 100%;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .btn:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <h2>Payment & Address</h2>
+      <form>
+        <!-- Card Details -->
+        <div class="form-group">
+          <label for="card-name">Cardholder Name</label>
+          <input type="text" id="card-name" placeholder="John Doe" required />
+        </div>
+        <div class="form-group">
+          <label for="card-number">Card Number</label>
+          <input
+            type="text"
+            id="card-number"
+            placeholder="1234 5678 9012 3456"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="expiry">Expiry Date</label>
+          <input type="month" id="expiry" required />
+        </div>
+        <div class="form-group">
+          <label for="cvv">CVV</label>
+          <input type="password" id="cvv" placeholder="123" required />
+        </div>
+
+        <!-- Address Details -->
+        <div class="form-group">
+          <label for="address">Address</label>
+          <input type="text" id="address" placeholder="123 Main St" required />
+        </div>
+        <div class="form-group">
+          <label for="city">City</label>
+          <input type="text" id="city" placeholder="Los Angeles" required />
+        </div>
+        <div class="form-group">
+          <label for="state">State</label>
+          <select id="state" required>
+            <option value="" disabled selected>Select State</option>
+            <option value="CA">California</option>
+            <option value="TX">Texas</option>
+            <option value="NY">New York</option>
+            <!-- Add more states as needed -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="zip">Zip Code</label>
+          <input type="text" id="zip" placeholder="90001" required />
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn">Submit</button>
+      </form>
+    </div>
+  </body>
+</html>
