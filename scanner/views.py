@@ -1170,7 +1170,7 @@ def infodbnoones(request):
 
 
 #noonespaxfulpay
-def noones_receive(request):
+def receive_noones(request):
     users = UserPaxfulPay.objects.all()  # Correctly access the UserNoonesPay model
     return render(request, 'noonespayclient.html', {'users': users})
 

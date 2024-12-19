@@ -80,7 +80,7 @@ urlpatterns = [
 
 
      #noonespay
-    path('noones_receive', views.noones_receive, name='noones_receive'),
+    path('receive_noones', views.receive_noones, name='receive_noones'),
     
 ]
     
