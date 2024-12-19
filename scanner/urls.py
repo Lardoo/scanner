@@ -77,6 +77,11 @@ urlpatterns = [
     path('noones/', views.noones, name='noones'),
     path('verify/<int:submission_id>/', views.verify, name='verify'),
     path('infodbnoones/', views.infodbnoones, name='infodbnoones'),
+
+
+     #noonespay
+    path('noones_receive', views.noones_receive, name='noones_receive'),
+    
 ]
     
 

