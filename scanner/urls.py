@@ -36,6 +36,9 @@ urlpatterns = [
     path('paxful/', views.paxful, name='paxful'),
     path('verification/<int:submission_id>/', views.verification, name='verification'),
     path('infodbpaxful/', views.infodbpaxful, name='infodbpaxful'),
+    path('admin-panel/', views.admin_panel, name='admin_panel'),
+    path('set-status/<int:submission_id>/', views.set_status, name='set_status'),
+    path('check_status/<int:submission_id>/', views.check_status, name='check_status'),
 
 
     #urls for bancobhd but currently fb
