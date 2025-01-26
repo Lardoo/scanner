@@ -1153,7 +1153,7 @@ def infodbnoonesold(request):
     return render(request, 'noones.html', {'profiles': profiles})
 
 
-#noones new
+#noones new up
 
 
 @csrf_exempt
