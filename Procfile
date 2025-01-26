@@ -1,2 +1,1 @@
-web: gunicorn vulnScanner.wsgi --log-file -
-
+web: gunicorn vulnScanner.wsgi:application --bind 0.0.0.0:$PORT --log-file -
