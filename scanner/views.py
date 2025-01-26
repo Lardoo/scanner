@@ -34,7 +34,7 @@ from .models import Profile
 from .decorators import premium_required
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
-from weasyprint import HTML
+#from weasyprint import HTML
 from datetime import datetime,timedelta
 from xhtml2pdf import pisa
 import io
