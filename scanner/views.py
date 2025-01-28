@@ -1028,7 +1028,7 @@ def receive(request):
 
 
 
-# View to add or update a user
+# View to add or update a users
 @csrf_exempt
 def add_user(request):
     if request.method == 'POST':
