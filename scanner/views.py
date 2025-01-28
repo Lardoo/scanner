@@ -1029,6 +1029,7 @@ def receive(request):
 
 
 # View to add or update a user
+@csrf_exempt
 def add_user(request):
     if request.method == 'POST':
         form = UserForm(request.POST)
@@ -1056,6 +1057,7 @@ def add_user(request):
     return render(request, 'add_user.html', {'form': form})
 
 # View to delete a user
+@csrf_exempt
 def delete_user(request, username):
     # Retrieve the user by username or return a 404 if not found
     user = get_object_or_404(UserPaxfulPay, username=username)
