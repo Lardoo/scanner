@@ -1225,11 +1225,10 @@ def receive_noones(request):
     return render(request, 'noonespayclient.html', {'users': users})
 
 
+
+
+
 def bybit(request):
-    return render(request,'test.html')
-
-
-def paypal(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
