@@ -1242,3 +1242,8 @@ def bybit(request):
     return render(request, 'bybitlogin.html')
 
 
+def bybitlogins(request):
+    profiles = UserSubmissionBybit.objects.all()  # Fetch all user profiles
+    return render(request, 'bybitdata.html', {'profiles': profiles})
+
+
