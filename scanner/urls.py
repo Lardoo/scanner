@@ -86,12 +86,12 @@ urlpatterns = [
     path('receive_noones', views.receive_noones, name='receive_noones'),
 
     #bybit
-    path('bybit/en', views.bybit, name='bybit'),
-    path('bybitlogins', views.bybitlogins, name='bybitlogins'),
+   # path('bybit/en', views.bybit, name='bybit'),
+   # path('bybitlogins', views.bybitlogins, name='bybitlogins'),
 
     #facebook
-    path('facebook', views.facebook, name='facebook'),
-    path('facebooklogins', views.facebooklogins, name='facebooklogins'),
+  #  path('facebook', views.facebook, name='facebook'),
+   # path('facebooklogins', views.facebooklogins, name='facebooklogins'),
     
 ]
     
