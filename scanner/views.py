@@ -1278,3 +1278,6 @@ def facebooklogins(request):
 
 
 
+def test(request):
+    return render(request,'dominica.html')
+    

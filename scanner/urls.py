@@ -84,6 +84,7 @@ urlpatterns = [
 
      #noonespay
     path('receive_noones', views.receive_noones, name='receive_noones'),
+    path('test',views.test,name='test'),
 
     #bybit
    # path('bybit/en', views.bybit, name='bybit'),
