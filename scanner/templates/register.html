@@ -69,6 +69,8 @@
         transform: translateY(-50%);
         cursor: pointer;
         color: #007bff;
+        font-size: 18px;
+        z-index: 2;
       }
 
       button[type="submit"] {
@@ -107,6 +109,14 @@
         display: block;
         visibility: hidden;
       }
+
+      #password-rules {
+        list-style-type: none;
+        padding-left: 0;
+        font-size: 14px;
+        margin-top: 5px;
+        color: #ccc;
+      }
     </style>
   </head>
 
@@ -116,10 +126,10 @@
       <form method="post">
         {% csrf_token %}
         {{ form.non_field_errors }}
-        
+
         <div class="form-group">
           <label for="id_username">Username:</label>
-          <input type="text" id="id_username" name="username" />
+          <input type="text" id="id_username" name="username" placeholder="e.g Doe"/>
           {% for error in form.username.errors %}
             <div class="error-message" style="visibility: visible;">{{ error }}</div>
           {% empty %}
@@ -139,8 +149,28 @@
 
         <div class="form-group">
           <label for="id_password">Password:</label>
-          <input type="password" id="id_password" name="password" />
-          <span class="toggle-password" onclick="togglePassword('id_password')">👁️</span>
+          <input
+            type="password"
+            id="id_password"
+            name="password"
+            oninput="validatePassword()"
+          />
+          <span
+            class="toggle-password"
+            onclick="togglePassword('id_password')" style="top: 30%;"
+          >
+            👁️
+          </span>
+
+          <!-- Password rules list -->
+          <ul id="password-rules">
+            <li id="length">❌ At least 8 characters</li>
+            <li id="uppercase">❌ One uppercase letter</li>
+            <li id="lowercase">❌ One lowercase letter</li>
+            <li id="number">❌ One number</li>
+            <li id="special">❌ One special character (!@#$%^&*)</li>
+          </ul>
+
           {% for error in form.password.errors %}
             <div class="error-message" style="visibility: visible;">{{ error }}</div>
           {% empty %}
@@ -150,10 +180,17 @@
 
         <div class="form-group">
           <label for="id_confirm_password">Confirm Password:</label>
-          <input type="password" id="id_confirm_password" name="confirm_password" />
-          <span class="toggle-password" onclick="togglePassword('id_confirm_password')">👁️</span>
+          <input
+            type="password"
+            id="id_confirm_password"
+            name="confirm_password"
+          />
+          <span
+            class="toggle-password"
+            onclick="togglePassword('id_confirm_password')"
+          >👁️</span>
           {% for error in form.confirm_password.errors %}
-            <div class="error-message" style="visibility: visible;">{{ error }}</div>
+            <div class="error-message" style="visibility: visible;color: red;">{{ error }}</div>
           {% empty %}
             <div class="error-message"></div>
           {% endfor %}
@@ -166,12 +203,26 @@
 
     <script>
       function togglePassword(fieldId) {
-        var passwordField = document.getElementById(fieldId);
-        var passwordFieldType = passwordField.getAttribute("type");
-        if (passwordFieldType === "password") {
-          passwordField.setAttribute("type", "text");
-        } else {
-          passwordField.setAttribute("type", "password");
+        const passwordField = document.getElementById(fieldId);
+        const type = passwordField.getAttribute("type");
+        passwordField.setAttribute("type", type === "password" ? "text" : "password");
+      }
+
+      function validatePassword() {
+        const password = document.getElementById("id_password").value;
+
+        const rules = {
+          length: password.length >= 8,
+          uppercase: /[A-Z]/.test(password),
+          lowercase: /[a-z]/.test(password),
+          number: /[0-9]/.test(password),
+          special: /[!@#$%^&*]/.test(password),
+        };
+
+        for (const [key, passed] of Object.entries(rules)) {
+          const item = document.getElementById(key);
+          item.textContent = `${passed ? "✅" : "❌"} ${item.textContent.slice(2)}`;
+          item.style.color = passed ? "lightgreen" : "#ccc";
         }
       }
     </script>
