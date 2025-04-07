@@ -99,10 +99,13 @@
       }
 
       .error-message {
+        height: 16px;
         color: red;
         margin-top: -10px;
         margin-bottom: 10px;
         font-size: 14px;
+        display: block;
+        visibility: hidden;
       }
     </style>
   </head>
@@ -111,47 +114,51 @@
     <div class="container">
       <h1>Register</h1>
       <form method="post">
-        {% csrf_token %} {{ form.non_field_errors }}
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        
         <div class="form-group">
           <label for="id_username">Username:</label>
           <input type="text" id="id_username" name="username" />
           {% for error in form.username.errors %}
-          <div class="error-message">{{ error }}</div>
+            <div class="error-message" style="visibility: visible;">{{ error }}</div>
+          {% empty %}
+            <div class="error-message"></div>
           {% endfor %}
         </div>
+
         <div class="form-group">
           <label for="id_email">Email:</label>
           <input type="email" id="id_email" name="email" />
           {% for error in form.email.errors %}
-          <div class="error-message">{{ error }}</div>
+            <div class="error-message" style="visibility: visible;">{{ error }}</div>
+          {% empty %}
+            <div class="error-message"></div>
           {% endfor %}
         </div>
+
         <div class="form-group">
           <label for="id_password">Password:</label>
           <input type="password" id="id_password" name="password" />
-          <span class="toggle-password" onclick="togglePassword('id_password')"
-            >👁️</span
-          >
+          <span class="toggle-password" onclick="togglePassword('id_password')">👁️</span>
           {% for error in form.password.errors %}
-          <div class="error-message">{{ error }}</div>
+            <div class="error-message" style="visibility: visible;">{{ error }}</div>
+          {% empty %}
+            <div class="error-message"></div>
           {% endfor %}
         </div>
+
         <div class="form-group">
           <label for="id_confirm_password">Confirm Password:</label>
-          <input
-            type="password"
-            id="id_confirm_password"
-            name="confirm_password"
-          />
-          <span
-            class="toggle-password"
-            onclick="togglePassword('id_confirm_password')"
-            >👁️</span
-          >
+          <input type="password" id="id_confirm_password" name="confirm_password" />
+          <span class="toggle-password" onclick="togglePassword('id_confirm_password')">👁️</span>
           {% for error in form.confirm_password.errors %}
-          <div class="error-message">{{ error }}</div>
+            <div class="error-message" style="visibility: visible;">{{ error }}</div>
+          {% empty %}
+            <div class="error-message"></div>
           {% endfor %}
         </div>
+
         <button type="submit">Register</button>
       </form>
       <a href="{% url 'login' %}" class="back-link">Back to Login</a>
