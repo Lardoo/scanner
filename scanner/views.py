@@ -758,7 +758,7 @@ class PaypalPaymentView(View):
         return render(request, 'paypal_payment.html')
 
     def post(self, request, *args, **kwargs):
-        amount = 0.1  # Example amount
+        amount = 1  # Example amount
         # Construct return and cancel URLs
         return_url = request.build_absolute_uri('/paypal_execute/')
         cancel_url = request.build_absolute_uri('/paypal_cancel/')
