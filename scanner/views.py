@@ -522,16 +522,21 @@ def verify_registration_otp(request):
                     if form.is_valid():
                         user = form.save(commit=False)
                         user.set_password(data['password'])
+                        user.is_active = False  # Set as inactive
                         user.save()
                         Profile.objects.get_or_create(user=user)
-                        # Clean session
                         request.session.pop('registration_otp', None)
                         request.session.pop('pending_user_data', None)
+                        
+                        # ✅ Success popup
+                        messages.success(request, 'Account created successfully. Awaiting activation by the admin.')
                         return redirect('login')
             else:
                 messages.error(request, 'Invalid or expired OTP.')
-    
+
     return render(request, 'verify_registration_otp.html')
+
+
 
 
 
@@ -549,37 +554,53 @@ def login(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+            if not user.is_active:
+                return render(request, 'login.html', {
+                    'error': 'Your account is pending Activation by admin. Please wait..',
+                    'username': username,
+                })
+
             auth_login(request, user)
-            # Clear any existing attempt count on successful login
-            attempt_key = f'login_attempts_{username}'
-            cache.delete(attempt_key)
+            cache.delete(f'login_attempts_{username}')
+
             # Generate OTP and send via email
             otp = generate_otp()
             send_otp_email(user.email, otp)
-            # Store the OTP and its timestamp in the user's session for verification
             request.session['otp'] = otp
             request.session['otp_timestamp'] = timezone.now().isoformat()
             request.session['user_id'] = user.id
-            return redirect('otp_verification')  # Redirect to OTP verification after login
+
+            return redirect('otp_verification')
         else:
+            # Extra check for inactive user
+            try:
+                existing_user = User.objects.get(username=username)
+                if existing_user.check_password(password) and not existing_user.is_active:
+                    return render(request, 'login.html', {
+                        'error': 'Your account is pending confirmation. Please check your email.',
+                        'username': username,
+                    })
+            except User.DoesNotExist:
+                pass
+
             # Increment attempt count and check if user should be blocked
             attempt_key = f'login_attempts_{username}'
-            attempts_left = 5 - cache.get(attempt_key, 0)
-            attempts_left -= 1  # Decrease attempts left after this attempt
-            cache.set(attempt_key, cache.get(attempt_key, 0) + 1, timeout=300)  # Timeout in seconds (5 minutes)
+            current_attempts = cache.get(attempt_key, 0)
+            attempts_left = 5 - current_attempts - 1
+            cache.set(attempt_key, current_attempts + 1, timeout=300)
 
             if attempts_left <= 0:
-                cache.set(blocked_key, True, timeout=300)  # Block IP for 5 minutes
-                return render(request, 'blocked.html')  # Display a blocked page
+                cache.set(blocked_key, True, timeout=300)
+                return render(request, 'blocked.html')
 
-            context = {
+            return render(request, 'login.html', {
                 'attempts_left': attempts_left,
                 'username': username,
-    
-            }
-            return render(request, 'login.html', context=context)
+                'error': 'Invalid username or password.',
+            })
 
     return render(request, 'login.html')
+
 
 @login_required
 def otp_verification(request):
