@@ -14,6 +14,17 @@
             text-align: center;
             color: #007bff;
         }
+        .meta-info {
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 10px;
+            background: #f2f2f2;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .meta-info p {
+            margin: 5px 0;
+        }
         .scan-result {
             margin-bottom: 20px;
             border: 1px solid #ccc;
@@ -37,44 +48,72 @@
         .payload span {
             color: #1e90ff;
         }
-        .download-pdf {
+        .actions {
             text-align: center;
             margin-top: 20px;
         }
-        .download-pdf a {
+        .actions a {
             display: inline-block;
             padding: 10px 20px;
             background-color: #007bff;
             color: #fff;
             text-decoration: none;
             border-radius: 5px;
+            margin: 5px;
         }
-        .download-pdf a:hover {
+        .actions a:hover {
             background-color: #0056b3;
+        }
+        .no-results {
+            text-align: center;
+            background-color: #e6ffe6;
+            border: 1px solid #b2fab4;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
     <h1>Scan Results</h1>
-    <div class="container">
-        {% for result in scan_results %}
-        <div class="scan-result">
-            <h2>{{ result.vulnerability_type }}</h2>
-            <p class="details"><span>Details:</span> {{ result.details }}</p>
-            <p class="mitigation"><span>Mitigation:</span> {{ result.mitigation }}</p>
-            {% if result.payload %}
-            <p class="payload"><span>Payload:</span> {{ result.payload }}</p>
-            {% endif %}
+
+  
+    {% if no_results %}
+        <div class="no-results">
+            <h2>✅ No SQL Injection Vulnerabilities Found</h2>
+            <p>Your scan completed successfully. No vulnerabilities were detected.</p>
         </div>
-        {% endfor %}
+    {% else %}
+        <div class="container">
+              <!-- Scan metadata shown always -->
+    <div class="meta-info">
+        <p><strong>Scan ID:</strong> {{ scan_id }}</p>
+        <p><strong>Scanned URL:</strong> {{ scanned_url }}</p>
+        <p><strong>Start Time:</strong> {{ scan_start_time }}</p>
+        <p><strong>End Time:</strong> {{ scan_end_time }}</p>
+        <p><strong>Duration:</strong> {{ scan_duration }}</p>
     </div>
 
-    <!-- Download PDF Button -->
-    <div class="download-pdf">
-        <a href="{% url 'download_scan_pdf' %}?scan_id={{ scan_id }}" class="btn">Download PDF</a>
-    </div>
-    <div class="download-pdf">
-        <a href="{% url 'scan' %}" >Scan another URL</a>
+            {% for result in scan_results %}
+                <div class="scan-result">
+                    <h2>{{ result.vulnerability_type }}</h2>
+                    <p class="details"><span>Details:</span> {{ result.details }}</p>
+                    <p class="mitigation"><span>Mitigation:</span> {{ result.mitigation }}</p>
+                    {% if result.payload %}
+                    <p class="payload"><span>Payload:</span> {{ result.payload }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Buttons -->
+    <div class="actions">
+        {% if not no_results %}
+            <a href="{% url 'download_scan_pdf' %}?scan_id={{ scan_id }}">Download PDF</a>
+        {% endif %}
+        <a href="{% url 'scan' %}">Scan another URL</a>
+        <a href="{% url 'dashboard' %}">Back to Dashboard</a>
     </div>
 </body>
 </html>

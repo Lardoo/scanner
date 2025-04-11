@@ -2,15 +2,14 @@
 <html lang="en">
 
 <head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="https://cdn1.iconfinder.com/data/icons/law-28/512/Biometrics-fingerprint-investigate-scanning-512.png" />
     <title>Scan</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: url('https://www.enterprisestorageforum.com/wp-content/uploads/2023/06/esf-vulnerability-scanning-and-management-696x453.png') no-repeat center center fixed;
             background-size: cover;
             color: #fff;
@@ -23,18 +22,19 @@
         }
 
         .container {
-            background-color: rgba(0, 0, 0, 0.8);
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: rgba(0, 0, 0, 0.85);
+            border-radius: 12px;
             padding: 40px;
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
             text-align: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
 
         h1 {
             margin-bottom: 30px;
-            color: #007bff;
+            color: #00b09b;
+            font-weight: bold;
         }
 
         form {
@@ -42,18 +42,21 @@
         }
 
         label {
-            font-weight: bold;
+            font-weight: 600;
         }
 
         input[type="url"],
         button[type="submit"] {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 6px;
             font-size: 16px;
-            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+
+        input[type="url"] {
+            background-color: #f9f9f9;
             color: #000;
         }
 
@@ -62,21 +65,35 @@
         }
 
         button[type="submit"] {
-            background-color: #007bff;
+            background-color: #00b09b;
             color: #fff;
             border: none;
-            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
         }
 
-        button[type="submit"]:hover {
-            background-color: #0056b3;
+        button[type="submit"]:hover:not(:disabled) {
+            background-color: #007b7a;
+        }
+
+        button[type="submit"]:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .alert-message {
+            display: none;
+            color: #ffc107;
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: left;
         }
 
         .back-link {
             display: block;
             margin-top: 20px;
             text-align: center;
-            color: #007bff;
+            color: #00b09b;
             text-decoration: none;
         }
 
@@ -90,8 +107,7 @@
             border-radius: 8px;
             overflow: hidden;
             margin-top: 20px;
-            display: none; /* Hide initially */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
         }
 
         #progress-bar {
@@ -111,7 +127,7 @@
         }
 
         .spinner {
-            display: none; /* Hide initially */
+            display: none;
             width: 50px;
             height: 50px;
             border: 8px solid rgba(255, 255, 255, 0.3);
@@ -125,6 +141,7 @@
             0% {
                 transform: rotate(0deg);
             }
+
             100% {
                 transform: rotate(360deg);
             }
@@ -155,40 +172,62 @@
         <form id="scan-form" method="post">
             {% csrf_token %}
             <label for="target_url">Target URL:</label>
-            <input type="url" id="target_url" name="target_url" required><br><br>
-            <input type="checkbox" id="deep_scan" name="deep_scan">
-            <label for="deep_scan">Deep Scan (Crawl the website for all endpoints)</label><br><br>
-            <button type="submit">Scan</button>
+            <input type="url" id="target_url" name="target_url" required />
+
+            <input type="checkbox" id="authorization_check" />
+            <label for="authorization_check">
+                I confirm that I am authorized to scan this website and acknowledge the developers are not liable for any harm.
+            </label>
+            <div class="alert-message" id="auth-alert">Please confirm authorization to proceed.</div>
+
+            <button type="submit" id="submit-button" disabled>Scan</button>
         </form>
+
         <div class="spinner" id="spinner"></div>
+
         <div id="progress-container">
             <div id="progress-bar">0%</div>
         </div>
+
         <div class="progress-status" id="progress-status">Initializing...</div>
+
         <div class="scan-summary" id="scan-summary" style="display: none;">
             <h2>Scan Summary</h2>
             <p id="summary-text"></p>
         </div>
+
         <a href="{% url 'dashboard' %}" class="back-link">Back to Dashboard</a>
     </div>
 
     <script>
+        const authCheckbox = document.getElementById('authorization_check');
+        const submitButton = document.getElementById('submit-button');
+        const alertMessage = document.getElementById('auth-alert');
+
+        authCheckbox.addEventListener('change', () => {
+            submitButton.disabled = !authCheckbox.checked;
+            alertMessage.style.display = 'none';
+        });
+
         document.getElementById('scan-form').addEventListener('submit', function (e) {
-            e.preventDefault(); // Prevent the form from submitting the traditional way
+            if (!authCheckbox.checked) {
+                e.preventDefault();
+                alertMessage.style.display = 'block';
+                return;
+            }
+
+            e.preventDefault();
             var formData = new FormData(this);
 
-            // Show spinner
             document.getElementById('spinner').style.display = 'block';
             document.getElementById('progress-status').textContent = 'Initializing...';
 
-            // Send the form data using fetch
             fetch('{% url "scan" %}', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                // Hide spinner and show progress bar
                 document.getElementById('spinner').style.display = 'none';
                 document.getElementById('progress-container').style.display = 'block';
                 document.getElementById('progress-status').style.display = 'block';
@@ -208,25 +247,25 @@
         function pollProgress(scanId) {
             var interval = setInterval(function () {
                 fetch(`/scan/progress/${scanId}/`)
-                .then(response => response.json())
-                .then(data => {
-                    updateProgress(data.progress);
-                    document.getElementById('progress-status').textContent = data.status;
+                    .then(response => response.json())
+                    .then(data => {
+                        updateProgress(data.progress);
+                        document.getElementById('progress-status').textContent = data.status;
 
-                    if (data.progress >= 100) {
+                        if (data.progress >= 100) {
+                            clearInterval(interval);
+                            document.getElementById('progress-status').textContent = 'Scan Complete';
+                            document.getElementById('summary-text').textContent = `Scan completed for ${scanId}. Redirecting to check results...`;
+                            document.getElementById('scan-summary').style.display = 'block';
+                            setTimeout(function () {
+                                window.location.href = `/scan/results/${scanId}/`;
+                            }, 2000);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
                         clearInterval(interval);
-                        document.getElementById('progress-status').textContent = 'Scan Complete';
-                        document.getElementById('summary-text').textContent = `Scan completed for ${scanId}. Redirecting to Check results for details.`;
-                        document.getElementById('scan-summary').style.display = 'block';
-                        setTimeout(function() {
-                            window.location.href = `/scan/results/${scanId}/`;
-                        }, 2000);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    clearInterval(interval);
-                });
+                    });
             }, 1000);
         }
     </script>
