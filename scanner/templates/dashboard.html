@@ -78,7 +78,6 @@
         .card-title {
             font-size: 2rem;
             margin-bottom: 1rem;
-     
         }
 
         .btn-primary {
@@ -158,12 +157,44 @@
                     <a href="{% url 'scan' %}" class="btn btn-primary">Start a Scan</a>
                 {% else %}
                     <p>Your account is currently <strong>Free</strong>. Upgrade to premium for comprehensive vulnerability scanning and enhanced security features.</p>
-                    <a href="{% url 'paypal_create' %}" class="btn btn-primary">Upgrade to Premium</a>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#paymentModal">Upgrade to Premium</button>
                 {% endif %}
             </section>
-            <hr>
 
+            <!-- Message for cash payment confirmation -->
+            {% if user.profile.cash_pending and not user.profile.premium_status %}
+            <div class="alert alert-warning mt-4" role="alert">
+                Your <strong>cash payment</strong> has been recorded. Please wait while we confirm your transaction. You'll receive a notification once your premium access is activated.
+            </div>
+            {% endif %}
+            <hr>
         </div>
     </main>
 
-    <footer>
+    <!-- Payment Method Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content text-dark">
+          <div class="modal-header">
+            <h5 class="modal-title" id="paymentModalLabel">Choose Payment Method</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Select your preferred payment method:</p>
+            <div class="d-flex flex-column">
+              <a href="{% url 'payment' %}" class="btn btn-outline-primary mb-2">💳 Card Payment</a>
+              <a href="{% url 'mpesa' %}" class="btn btn-outline-success mb-2">📱 M-Pesa</a>
+              <a href="{% url 'cash' %}" class="btn btn-outline-secondary">💵 Cash Payment</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS for Modal -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

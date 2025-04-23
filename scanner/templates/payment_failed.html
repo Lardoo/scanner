@@ -1,83 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="https://cdn1.iconfinder.com/data/icons/law-28/512/Biometrics-fingerprint-investigate-scanning-512.png" />
-    <title>Payment Failed</title>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: url('https://www.enterprisestorageforum.com/wp-content/uploads/2023/06/esf-vulnerability-scanning-and-management-696x453.png') no-repeat center center fixed;
-            background-size: cover;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            color: #fff;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://cdn1.iconfinder.com/data/icons/law-28/512/Biometrics-fingerprint-investigate-scanning-512.png" />
+  <title>Payment Failed</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: url('https://www.enterprisestorageforum.com/wp-content/uploads/2023/06/esf-vulnerability-scanning-and-management-696x453.png') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    }
 
-        .container {
-            background-color: rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
-            padding: 30px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            text-align: center;
-        }
+    .container {
+      background-color: rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
 
-        h1 {
-            font-size: 1.75rem;
-            margin-bottom: 1rem;
-        }
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
 
-        p {
-            color: #d9534f;
-            margin-bottom: 20px;
-            font-size: 1rem;
-        }
+    p {
+      color: #d9534f;
+      margin-bottom: 20px;
+      font-size: 1rem;
+    }
 
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #007bff;
-            text-decoration: none;
-            font-size: 1rem;
-        }
+    .back-link, .dashboard-link {
+      display: inline-block;
+      margin-top: 15px;
+      color: #007bff;
+      text-decoration: none;
+      font-size: 1rem;
+    }
 
-        .back-link:hover {
-            text-decoration: underline;
-        }
+    .back-link:hover,
+    .dashboard-link:hover {
+      text-decoration: underline;
+    }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-                margin: 0 10px;
-            }
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+        margin: 0 10px;
+      }
 
-            h1 {
-                font-size: 1.5rem;
-            }
+      h1 {
+        font-size: 1.5rem;
+      }
 
-            p {
-                font-size: 0.95rem;
-            }
+      p {
+        font-size: 0.95rem;
+      }
 
-            .back-link {
-                font-size: 0.95rem;
-            }
-        }
-    </style>
+      .back-link, .dashboard-link {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Payment Failed</h1>
-        <p>{{ message }}</p>
-        <a href="{% url 'paypal_create' %}" class="back-link">Retry Payment</a>
-    </div>
+  <div class="container">
+    <h1>Payment Failed</h1>
+    <p>{{ message }}</p>
+    <a href="{% url 'payment' %}" class="back-link">Retry Payment</a><br>
+    <a href="{% url 'dashboard' %}" class="dashboard-link">Back to Dashboard</a>
+  </div>
 </body>
 </html>

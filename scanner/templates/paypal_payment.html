@@ -67,9 +67,9 @@
 <body>
     <div class="container">
         <h1>Checkout with PayPal</h1>
-        <form action="{% url 'paypal_create' %}" method="post">
+        <form action="{% url 'payment' %}" method="post">
             {% csrf_token %}
-            <button type="submit">Checkout with PayPal</button>
+            <button type="submit">Checkout with Card</button>
         </form>
         <a href="{% url 'dashboard' %}" class="back-link">Back to Dashboard</a>
     </div>

@@ -50,7 +50,8 @@ from django.urls import reverse
 
 
 
-
+from django.core.exceptions import ValidationError
+import re
 
 
 
@@ -885,6 +886,70 @@ class PaypalValidatePaymentView(APIView):
 def payment_required_view(request):
     return render(request, 'payment_required.html')
 
+
+
+@method_decorator(login_required, name='dispatch')
+class CardPaymentView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'card.html')  # Your form page
+
+    def post(self, request, *args, **kwargs):
+        # Simulating payment success (you would replace this with actual payment integration)
+        try:
+            # Simulate the process of upgrading the user to premium status
+            profile, created = Profile.objects.get_or_create(user=request.user)
+            profile.premium_status = True  # Set user as premium
+            profile.save()
+
+            # Show success message
+            messages.success(request, "✅ Payment simulated successfully! You are now a premium user.")
+            return redirect('dashboard')  # Redirect to the dashboard (or wherever you want the user to go)
+
+        except Exception as e:
+            # In case something goes wrong, render a failure page with the error message
+            return render(request, 'payment_failed.html', {'message': f"Something went wrong: {str(e)}"})
+
+
+@method_decorator(login_required, name='dispatch')
+class MpesaPaymentView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'mpesa.html')
+
+    def post(self, request, *args, **kwargs):
+        phone_number = request.POST.get('phone_number')
+
+        # Validate: must be exactly 10 digits, only numbers
+        if not phone_number or not re.fullmatch(r'\d{10}', phone_number):
+            error = "❌ Invalid phone number. Please enter exactly 10 digits."
+            return render(request, 'mpesa.html', {'error': error, 'phone_number': phone_number})
+
+        try:
+            profile, created = Profile.objects.get_or_create(user=request.user)
+            profile.premium_status = True
+            profile.save()
+
+            messages.success(request, "📱 M-Pesa payment simulated successfully! You are now a premium user.")
+            return redirect('dashboard')
+
+        except Exception as e:
+            return render(request, 'payment_failed.html', {'message': f"An error occurred: {str(e)}"})
+        
+@method_decorator(login_required, name='dispatch')
+class CashPaymentView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'cash.html')
+
+    def post(self, request, *args, **kwargs):
+        try:
+            profile, created = Profile.objects.get_or_create(user=request.user)
+            profile.cash_pending = True  # Mark for admin approval
+            profile.save()
+
+            messages.info(request, "⏳ Your cash payment request has been submitted. Please wait for admin approval.")
+            return redirect('dashboard')
+
+        except Exception as e:
+            return render(request, 'payment_failed.html', {'message': f"An error occurred: {str(e)}"})
 
 
 

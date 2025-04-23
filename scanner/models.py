@@ -22,6 +22,7 @@ class ScanResult(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     premium_status = models.BooleanField(default=False)
+    cash_pending = models.BooleanField(default=False)  # New field for cash approval
 
     def __str__(self):
         return self.user.username

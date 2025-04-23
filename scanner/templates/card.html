@@ -1,0 +1,527 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add a Bank Card</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: url('https://www.enterprisestorageforum.com/wp-content/uploads/2023/06/esf-vulnerability-scanning-and-management-696x453.png') no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    form {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 40px;
+      padding: 20px;
+      background-color: white; /* Make sure the form content is clearly visible */
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #444;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .input-with-icons {
+      position: relative;
+    }
+
+    .card-icons {
+      position: absolute;
+      right: 10px;
+      top: 30%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 6px;
+    }
+
+    .card-icons img {
+      height: 28px;
+      width: auto;
+    }
+
+    .card-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .card-row input {
+      flex: 1;
+    }
+
+    .cvv-wrapper {
+      position: relative;
+    }
+
+    .cvv-wrapper input {
+      padding-right: 40px;
+    }
+
+    .cvv-wrapper::after {
+      content: "";
+      background-image: url('https://img.icons8.com/ios-glyphs/30/000000/bank-card-back-side.png');
+      background-size: 24px 24px;
+      background-repeat: no-repeat;
+      background-position: center;
+      position: absolute;
+      right: 10px;
+      top: 40%;
+      width: 24px;
+      height: 24px;
+      transform: translateY(-50%);
+      opacity: 0.6;
+      border-radius: 4px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      margin-right: 8px;
+    }
+
+    button {
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: lowercase;
+    }
+
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+
+    .cancel-button {
+      background-color: red;
+      color: white;
+      margin-top: 10px;
+      text-align: center;
+      padding: 12px;
+      border: none;
+      width: 100%;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .cancel-button:hover {
+      background-color: darkred;
+    }
+
+    .error {
+      color: red;
+      font-size: 12px;
+      margin-top: -12px;
+      margin-bottom: 12px;
+    }
+
+    .input-error {
+      border-color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="paymentForm" method="POST" action="{% url 'payment' %}">
+     {% csrf_token %}
+    <h3>Upgrade to Premium</h3>
+
+    <label for="card-number">Card information</label>
+    <div class="input-with-icons">
+      <input type="text" id="card-number" placeholder="1234 1234 1234 1234" maxlength="19" required="">
+      <div class="card-icons">
+        <img src="https://img.icons8.com/color/48/visa.png" alt="Visa">
+        <img src="https://img.icons8.com/color/48/mastercard.png" alt="Mastercard">
+        <img src="https://img.icons8.com/color/48/amex.png" alt="Amex">
+        <img src="https://img.icons8.com/color/48/discover.png" alt="Discover">
+      </div>
+    </div>
+    <div id="card-number-error" class="error"></div>
+
+    <div class="card-row">
+      <input type="text" id="expiry" placeholder="MM / YY" maxlength="7" required="">
+      <div class="cvv-wrapper">
+        <input type="text" id="cvv" placeholder="CVC" maxlength="4" required="">
+      </div>
+    </div>
+    <div id="expiry-error" class="error"></div>
+    <div id="cvv-error" class="error"></div>
+
+    <label for="card-name">Name on card</label>
+    <input type="text" id="card-name" placeholder="John Doe" required="">
+    <div id="card-name-error" class="error"></div>
+
+    <label for="country">Country or region</label>
+    <select id="country" required="">
+      <option value="">Select country</option>
+      <option>Afghanistan</option>
+      <option>Albania</option>
+      <option>Algeria</option>
+      <option>Andorra</option>
+      <option>Angola</option>
+      <option>Antigua and Barbuda</option>
+      <option>Argentina</option>
+      <option>Armenia</option>
+      <option>Australia</option>
+      <option>Austria</option>
+      <option>Azerbaijan</option>
+      <option>Bahamas</option>
+      <option>Bahrain</option>
+      <option>Bangladesh</option>
+      <option>Barbados</option>
+      <option>Belarus</option>
+      <option>Belgium</option>
+      <option>Belize</option>
+      <option>Benin</option>
+      <option>Bhutan</option>
+      <option>Bolivia</option>
+      <option>Bosnia and Herzegovina</option>
+      <option>Botswana</option>
+      <option>Brazil</option>
+      <option>Brunei</option>
+      <option>Bulgaria</option>
+      <option>Burkina Faso</option>
+      <option>Burundi</option>
+      <option>Cabo Verde</option>
+      <option>Cambodia</option>
+      <option>Cameroon</option>
+      <option>Canada</option>
+      <option>Central African Republic</option>
+      <option>Chad</option>
+      <option>Chile</option>
+      <option>China</option>
+      <option>Colombia</option>
+      <option>Comoros</option>
+      <option>Congo (Congo-Brazzaville)</option>
+      <option>Costa Rica</option>
+      <option>Croatia</option>
+      <option>Cuba</option>
+      <option>Cyprus</option>
+      <option>Czech Republic</option>
+      <option>Democratic Republic of the Congo</option>
+      <option>Denmark</option>
+      <option>Djibouti</option>
+      <option>Dominica</option>
+      <option>Dominican Republic</option>
+      <option>Ecuador</option>
+      <option>Egypt</option>
+      <option>El Salvador</option>
+      <option>Equatorial Guinea</option>
+      <option>Eritrea</option>
+      <option>Estonia</option>
+      <option>Eswatini</option>
+      <option>Ethiopia</option>
+      <option>Fiji</option>
+      <option>Finland</option>
+      <option>France</option>
+      <option>Gabon</option>
+      <option>Gambia</option>
+      <option>Georgia</option>
+      <option>Germany</option>
+      <option>Ghana</option>
+      <option>Greece</option>
+      <option>Grenada</option>
+      <option>Guatemala</option>
+      <option>Guinea</option>
+      <option>Guinea-Bissau</option>
+      <option>Guyana</option>
+      <option>Haiti</option>
+      <option>Honduras</option>
+      <option>Hungary</option>
+      <option>Iceland</option>
+      <option>India</option>
+      <option>Indonesia</option>
+      <option>Iran</option>
+      <option>Iraq</option>
+      <option>Ireland</option>
+      <option>Israel</option>
+      <option>Italy</option>
+      <option>Ivory Coast</option>
+      <option>Jamaica</option>
+      <option>Japan</option>
+      <option>Jordan</option>
+      <option>Kazakhstan</option>
+      <option>Kenya</option>
+      <option>Kiribati</option>
+      <option>Kuwait</option>
+      <option>Kyrgyzstan</option>
+      <option>Laos</option>
+      <option>Latvia</option>
+      <option>Lebanon</option>
+      <option>Lesotho</option>
+      <option>Liberia</option>
+      <option>Libya</option>
+      <option>Liechtenstein</option>
+      <option>Lithuania</option>
+      <option>Luxembourg</option>
+      <option>Madagascar</option>
+      <option>Malawi</option>
+      <option>Malaysia</option>
+      <option>Maldives</option>
+      <option>Mali</option>
+      <option>Malta</option>
+      <option>Marshall Islands</option>
+      <option>Mauritania</option>
+      <option>Mauritius</option>
+      <option>Mexico</option>
+      <option>Micronesia</option>
+      <option>Moldova</option>
+      <option>Monaco</option>
+      <option>Mongolia</option>
+      <option>Montenegro</option>
+      <option>Morocco</option>
+      <option>Mozambique</option>
+      <option>Myanmar (Burma)</option>
+      <option>Namibia</option>
+      <option>Nauru</option>
+      <option>Nepal</option>
+      <option>Netherlands</option>
+      <option>New Zealand</option>
+      <option>Nicaragua</option>
+      <option>Niger</option>
+      <option>Nigeria</option>
+      <option>North Korea</option>
+      <option>North Macedonia</option>
+      <option>Norway</option>
+      <option>Oman</option>
+      <option>Pakistan</option>
+      <option>Palau</option>
+      <option>Palestine</option>
+      <option>Panama</option>
+      <option>Papua New Guinea</option>
+      <option>Paraguay</option>
+      <option>Peru</option>
+      <option>Philippines</option>
+      <option>Poland</option>
+      <option>Portugal</option>
+      <option>Qatar</option>
+      <option>Romania</option>
+      <option>Russia</option>
+      <option>Rwanda</option>
+      <option>Saint Kitts and Nevis</option>
+      <option>Saint Lucia</option>
+      <option>Saint Vincent and the Grenadines</option>
+      <option>Samoa</option>
+      <option>San Marino</option>
+      <option>Sao Tome and Principe</option>
+      <option>Saudi Arabia</option>
+      <option>Senegal</option>
+      <option>Serbia</option>
+      <option>Seychelles</option>
+      <option>Sierra Leone</option>
+      <option>Singapore</option>
+      <option>Slovakia</option>
+      <option>Slovenia</option>
+      <option>Solomon Islands</option>
+      <option>Somalia</option>
+      <option>South Africa</option>
+      <option>South Korea</option>
+      <option>South Sudan</option>
+      <option>Spain</option>
+      <option>Sri Lanka</option>
+      <option>Sudan</option>
+      <option>Suriname</option>
+      <option>Sweden</option>
+      <option>Switzerland</option>
+      <option>Syria</option>
+      <option>Taiwan</option>
+      <option>Tajikistan</option>
+      <option>Tanzania</option>
+      <option>Thailand</option>
+      <option>Timor-Leste</option>
+      <option>Togo</option>
+      <option>Tonga</option>
+      <option>Trinidad and Tobago</option>
+      <option>Tunisia</option>
+      <option>Turkey</option>
+      <option>Turkmenistan</option>
+      <option>Tuvalu</option>
+      <option>Uganda</option>
+      <option>Ukraine</option>
+      <option>United Arab Emirates</option>
+      <option>United Kingdom</option>
+      <option>United States</option>
+      <option>Uruguay</option>
+      <option>Uzbekistan</option>
+      <option>Vanuatu</option>
+      <option>Vatican City</option>
+      <option>Venezuela</option>
+      <option>Vietnam</option>
+      <option>Yemen</option>
+      <option>Zambia</option>
+      <option>Zimbabwe</option>
+      <!-- Add other countries if needed -->
+    </select>
+    <div id="country-error" class="error"></div>
+
+    <input type="text" placeholder="Address" required="">
+
+    <button type="submit" id="upgrade-button" disabled style="font-size: 20px;">Upgrade</button>
+
+    <button type="button" class="cancel-button" onclick="window.location.href='/paypal_cancel'
+    ">Cancel</button> <!-- Redirect to dashboard -->
+
+  </form>
+
+  <script>
+    // Auto-format expiry as MM/YY
+    document.getElementById("expiry").addEventListener("input", function (e) {
+      let value = e.target.value.replace(/\D/g, ""); // Remove non-digits
+      if (value.length > 4) value = value.slice(0, 4);
+      if (value.length > 2) value = value.slice(0, 2) + "/" + value.slice(2);
+      e.target.value = value;
+    });
+
+    // Auto-format card number as 4-digit chunks
+    document.getElementById("card-number").addEventListener("input", function (e) {
+      let value = e.target.value.replace(/\D/g, "").slice(0, 16); // max 16 digits
+      let chunks = value.match(/.{1,4}/g);
+      e.target.value = chunks ? chunks.join(" ") : "";
+    });
+
+    // Validate expiry date MM/YY
+    function validateExpiry(value) {
+      if (!/^\d{2}\/\d{2}$/.test(value)) return false;
+
+      const [month, year] = value.split("/").map(Number);
+      if (month < 1 || month > 12) return false;
+
+      const now = new Date();
+      const currentMonth = now.getMonth() + 1;
+      const currentYear = now.getFullYear() % 100;
+
+      return year > currentYear || (year === currentYear && month >= currentMonth);
+    }
+
+    // Validate known card types by prefix
+    function validateCardNumber(value) {
+      const raw = value.replace(/\s+/g, "");
+      if (!/^\d{16}$/.test(raw)) return false;
+
+      const prefix6 = raw.slice(0, 6);
+      const prefix4 = raw.slice(0, 4);
+      const prefix3 = raw.slice(0, 3);
+      const prefix2 = raw.slice(0, 2);
+      const prefix1 = raw.slice(0, 1);
+
+      const inRange = (start, end, val) => {
+        const num = parseInt(val);
+        return num >= start && num <= end;
+      };
+
+      return (
+        prefix1 === "4" || // Visa
+        ["51", "52", "53", "54", "55"].includes(prefix2) || // MasterCard (old)
+        inRange(222100, 272099, prefix6) || // MasterCard (new)
+        ["34", "37"].includes(prefix2) || // AmEx
+        ["6011", "65"].includes(prefix4) || inRange(644, 649, prefix3) || // Discover
+        prefix2 === "35" || // JCB
+        ["300", "301", "302", "303", "304", "305", "36", "38", "39"].includes(prefix3) // Diners Club
+      );
+    }
+
+    // Validate CVV (3 or 4 digits)
+    function validateCVV(cvv, cardNumber) {
+      const cardType = getCardType(cardNumber); // Function to get card type based on the card number
+      const isValid = /^\d{3,4}$/.test(cvv); // CVV should be numeric and 3 or 4 digits
+
+      // If the card is Amex (American Express), check for 4 digits, otherwise 3 digits
+      return isValid && ((cardType === 'Amex' && cvv.length === 4) || (cardType !== 'Amex' && cvv.length === 3));
+    }
+
+    // Get card type based on card number (Visa, MasterCard, Amex, etc.)
+    function getCardType(cardNumber) {
+      const raw = cardNumber.replace(/\s+/g, "");
+      if (/^3[47]/.test(raw)) return "Amex"; // American Express (starts with 34 or 37)
+      if (/^4/.test(raw)) return "Visa"; // Visa (starts with 4)
+      if (/^5[1-5]/.test(raw)) return "MasterCard"; // MasterCard (starts with 51-55)
+      if (/^6/.test(raw)) return "Discover"; // Discover (starts with 6)
+      return null; // Unknown card type
+    }
+
+    // Add validation on input blur events
+    document.getElementById("card-number").addEventListener("blur", function (e) {
+      const cardNumber = e.target.value;
+      const valid = validateCardNumber(cardNumber);
+      document.getElementById("card-number-error").textContent = valid ? "" : "Invalid card number";
+    });
+
+    document.getElementById("expiry").addEventListener("blur", function (e) {
+      const expiry = e.target.value;
+      const valid = validateExpiry(expiry);
+      document.getElementById("expiry-error").textContent = valid ? "" : "Invalid expiry date";
+    });
+
+    document.getElementById("cvv").addEventListener("blur", function (e) {
+      const cvv = e.target.value;
+      const cardNumber = document.getElementById("card-number").value;
+      const valid = validateCVV(cvv, cardNumber);
+      document.getElementById("cvv-error").textContent = valid ? "" : "Invalid CVV";
+    });
+
+    document.getElementById("card-name").addEventListener("blur", function (e) {
+      const name = e.target.value;
+      const valid = name.trim().length > 0;
+      document.getElementById("card-name-error").textContent = valid ? "" : "Name is required";
+    });
+
+    document.getElementById("country").addEventListener("blur", function (e) {
+      const country = e.target.value;
+      const valid = country.trim().length > 0;
+      document.getElementById("country-error").textContent = valid ? "" : "Country is required";
+    });
+
+    document.getElementById("paymentForm").addEventListener("input", function () {
+      const cardNumber = document.getElementById("card-number").value;
+      const expiry = document.getElementById("expiry").value;
+      const cvv = document.getElementById("cvv").value;
+      const name = document.getElementById("card-name").value;
+      const country = document.getElementById("country").value;
+
+      const isFormValid =
+        validateCardNumber(cardNumber) && validateExpiry(expiry) && validateCVV(cvv, cardNumber) && name.trim() !== "" && country.trim() !== "";
+
+      document.getElementById("upgrade-button").disabled = !isFormValid;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulate M-Pesa Payment</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://www.enterprisestorageforum.com/wp-content/uploads/2023/06/esf-vulnerability-scanning-and-management-696x453.png') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .payment-container {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .payment-container h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    .payment-container input[type="tel"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    .payment-container button,
+    .back-button {
+      background-color: #34b233;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .payment-container button:hover,
+    .back-button:hover {
+      background-color: #2e9e2d;
+    }
+
+    .mpesa-icon {
+      font-size: 48px;
+      color: #34b233;
+      margin-bottom: 15px;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="payment-container">
+    <div class="mpesa-icon">📱</div>
+    <h2> M-Pesa Payment</h2>
+    
+    {% if error %}
+      <div class="error-message">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <input 
+        type="tel" 
+        name="phone_number" 
+        inputmode="numeric" 
+        pattern="\d{10}" 
+        maxlength="10" 
+        placeholder="Enter 10-digit phone number" 
+        required 
+        value="{{ phone_number|default:'' }}"
+        title="Phone number must be exactly 10 digits."
+      />
+      <button type="submit">Make Payment</button>
+    </form>
+
+    <a href="{% url 'dashboard' %}" class="back-button">← Back to Dashboard</a>
+  </div>
+</body>
+</html>
